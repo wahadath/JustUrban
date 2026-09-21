@@ -1,0 +1,111 @@
+﻿@page
+@model JustUrban.Pages.paymentModel
+@{
+    ViewData["Title"] = "Secure Checkout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-header bg-dark text-white text-center py-3">
+                    <h4 class="mb-0 fw-bold">Secure Checkout</h4>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <!-- Fixed Amount Alert -->
+                    <div class="alert alert-secondary text-center py-3 mb-4 rounded-3 border-0">
+                        <span class="text-muted d-block text-uppercase small">Amount to Pay</span>
+                        <h2 class="fw-bold text-success m-0">₹49.00</h2>
+                    </div>
+
+                    <!-- Payment Option Form -->
+                    <form method="post">
+                        <label class="form-label fw-bold text-secondary mb-3">Choose Payment Method:</label>
+
+                        <!-- Online Option -->
+                        <div class="form-check p-3 border rounded-3 mb-3 custom-card">
+                            <input class="form-check-input ms-1" type="radio" name="paymentMethod" value="Online" id="payOnline" checked>
+                            <label class="form-check-label fw-bold ms-3" for="payOnline">
+                                🌐 Pay Online
+                            </label>
+                            <span class="d-block text-muted small ms-3 mt-1">UPI (GPay/PhonePe), Cards, NetBanking</span>
+                        </div>
+
+                        <!-- Offline Option -->
+                        <div class="form-check p-3 border rounded-3 mb-4 custom-card">
+                            <input class="form-check-input ms-1" type="radio" name="paymentMethod" value="Offline" id="payOffline">
+                            <label class="form-check-label fw-bold ms-3" for="payOffline">
+                                💵 Pay Offline
+                            </label>
+                            <span class="d-block text-muted small ms-3 mt-1">Cash on Delivery / Pay at Desk</span>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm py-2">
+                            Proceed with Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!--          DYNAMIC POP-UP MODALS             -->
+<!-- ========================================== -->
+
+<!-- Success Modal Overlay -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-body text-center p-5">
+                <div class="text-success mb-4" style="font-size: 4rem;">✅</div>
+                <h3 class="fw-bold text-success mb-2">Transaction Success</h3>
+                <p class="text-muted mb-4">@TempData["PopupMessage"]</p>
+                <a href="/Index" class="btn btn-success px-4 py-2 fw-bold w-100 rounded-3">Go to Home Screen</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Failure Modal Overlay -->
+<div class="modal fade" id="failureModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-body text-center p-5">
+                <div class="text-danger mb-4" style="font-size: 4rem;">⚠️</div>
+                <h3 class="fw-bold text-danger mb-2">Transaction Failed</h3>
+                <p class="text-muted mb-4">@TempData["PopupMessage"]</p>
+                <button type="button" class="btn btn-danger px-4 py-2 fw-bold w-100 rounded-3" data-bs-dismiss="modal">Try Again</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styling Refinements -->
+<style>
+    .custom-card:hover {
+        background-color: #f8f9fa;
+        border-color: #198754 !important;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+    }
+</style>
+
+<!-- Script to Automatically Trigger Pop-ups based on backend response state -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var popupType = '@TempData["PopupType"]';
+            
+            if (popupType === "Success") {
+                var myModal = new bootstrap.Modal(document.getElementById('successModal'));
+                myModal.show();
+            } else if (popupType === "Failure") {
+                var myModal = new bootstrap.Modal(document.getElementById('failureModal'));
+                myModal.show();
+            }
+        });
+    </script>
+}

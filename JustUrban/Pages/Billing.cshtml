@@ -1,0 +1,193 @@
+﻿@page
+@model JustUrban.Pages.BillingModel
+@{
+    ViewData["Title"] = "Billing Details";
+}
+
+<!-- Direct Injection of Bootstrap Icons for sleek map indicators -->
+<link rel="stylesheet" href="https://jsdelivr.net">
+
+<style>
+    .billing-card {
+        border-radius: 24px;
+        border: 1px solid #edf2f7;
+        max-width: 650px;
+        background-color: #ffffff;
+    }
+    .brand-purple-btn {
+        background-color: #6b46e5;
+        color: #ffffff !important;
+        border-radius: 12px;
+        font-weight: 600;
+        height: 52px;
+        border: none;
+        transition: background-color 0.2s ease;
+    }
+    .brand-purple-btn:hover {
+        background-color: #5a36cb;
+    }
+    .map-btn {
+        border: 1px dashed #6b46e5;
+        color: #6b46e5;
+        background-color: #f3f0ff;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    .map-btn:hover {
+        background-color: #6b46e5;
+        color: #ffffff;
+    }
+    .form-control:focus {
+        border-color: #6b46e5;
+        box-shadow: 0 0 0 0.25rem rgba(107, 70, 229, 0.15);
+    }
+</style>
+
+<div class="container my-5 py-2 d-flex justify-content-center">
+    <div class="card billing-card p-4 p-md-5 shadow-sm w-100">
+        
+        <!-- Back Navigation Link -->
+        <a asp-page="/SelectSlot" class="text-decoration-none text-secondary small fw-bold mb-3 d-inline-block">
+            <i class="bi bi-arrow-left me-1"></i> Back to slot selection
+        </a>
+
+        <!-- Main Title Header -->
+        <h3 class="fw-bold text-dark mb-4" style="letter-spacing: -0.5px;">Billing Details</h3>
+
+        <form method="post">
+            <div class="row g-3">
+                
+                <!-- Name Field Input Box -->
+                <div class="col-12">
+                    <label class="form-label small fw-semibold text-secondary">Name</label>
+                    <input type="text" name="CustomerName" class="form-control py-2 rounded-3" placeholder="Enter full name" required />
+                </div>
+
+                <!-- Contact Field Input Box -->
+                <div class="col-12">
+                    <label class="form-label small fw-semibold text-secondary">Contact</label>
+                    <input type="tel" name="ContactNumber" class="form-control py-2 rounded-3" placeholder="Enter contact phone number" required />
+                </div>
+
+                <!-- City Field Input Box -->
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold text-secondary">City</label>
+                    <input type="text" name="City" class="form-control py-2 rounded-3" placeholder="e.g. Bengaluru" required />
+                </div>
+
+                <!-- Pincode Field Input Box -->
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold text-secondary">Pincode</label>
+                    <input type="text" name="Pincode" class="form-control py-2 rounded-3" placeholder="6-digit pincode" pattern="\d{6}" required />
+                </div>
+
+                <!-- Address Input Box Textarea element -->
+                <div class="col-12 mb-2">
+                    <label class="form-label small fw-semibold text-secondary">Address</label>
+                    <textarea name="StreetAddress" rows="3" class="form-control rounded-3" placeholder="House number, street address, locality details..." required></textarea>
+                </div>
+
+                <!-- Map Integration Block Option -->
+                <div class="col-12 mb-4">
+                    <div class="p-3 bg-light rounded-3 text-center border">
+                        <p class="small text-muted mb-2 fw-medium">Want to save entry time?</p>
+                        <button type="button" class="btn btn-sm map-btn px-4 py-2 w-100" onclick="launchDoorstepMap()">
+                            <i class="bi bi-geo-alt-fill me-1"></i> Select from Google Map
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Proceed To Pay Button -->
+                <div class="col-12">
+                    <button type="submit" class="w-100 brand-purple-btn d-flex align-items-center justify-content-center fs-5 shadow-sm">
+                        Proceed to Pay <i class="bi bi-credit-card ms-2"></i>
+                    </button>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // 🟢 CHANGED FUNCTION NAME TO BREAK BROWSER CACHE LOCK
+        function launchDoorstepMap() {
+            const mapBtn = document.querySelector('.map-btn');
+            const originalContent = mapBtn.innerHTML;
+            
+            mapBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Locating your doorstep...`;
+            mapBtn.disabled = true;
+
+            var geoOptions = {
+                enableHighAccuracy: false, // Uses fast network IP routing to prevent timeout errors
+                timeout: 5000,             
+                maximumAge: 30000          
+            };
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
+
+                        // 🟢 EXTRACTED AND VERIFIED CLEAN URL SYNTAX
+                        var cleanMapsUrl = "https://google.com" + lat + "," + lng;
+                        window.open(cleanMapsUrl, '_blank');
+
+                        var geocodeUrl = "https://openstreetmap.org" + lat + "&lon=" + lng;
+
+                        fetch(geocodeUrl, {
+                            method: 'GET',
+                            headers: { 
+                                'Accept-Language': 'en',
+                                'User-Agent': 'JustUrbanApp/1.0 (contact: support@justurban.com)' 
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.address) {
+                                var addr = data.address;
+                                var city = addr.city || addr.town || addr.village || addr.suburb || "Bengaluru";
+                                var pincode = addr.postcode || "560001";
+                                var displayAddress = data.display_name || "Detected Location Coordinates";
+
+                                document.querySelector('input[name="City"]').value = city;
+                                document.querySelector('input[name="Pincode"]').value = pincode.replace(/\s/g, '');
+                                document.querySelector('textarea[name="StreetAddress"]').value = displayAddress;
+                            }
+                            mapBtn.innerHTML = originalContent;
+                            mapBtn.disabled = false;
+                        })
+                        .catch(err => {
+                            console.warn("Reverse lookup failed, using fallbacks.", err);
+                            injectFallbackData();
+                        });
+                    },
+                    function (error) {
+                        console.warn("GPS tracking timed out or blocked: " + error.message);
+                        injectFallbackData();
+                    },
+                    geoOptions
+                );
+            } else {
+                alert("Location services are entirely unsupported by this browser.");
+                mapBtn.innerHTML = originalContent;
+                mapBtn.disabled = false;
+            }
+
+            function injectFallbackData() {
+                document.querySelector('input[name="City"]').value = "Bengaluru";
+                document.querySelector('input[name="Pincode"]').value = "560001";
+                document.querySelector('textarea[name="StreetAddress"]').value = "Bengaluru, Karnataka, India";
+                
+                window.open("https://google.comBengaluru+Karnataka", '_blank');
+
+                mapBtn.innerHTML = originalContent;
+                mapBtn.disabled = false;
+            }
+        }
+    </script>
+}

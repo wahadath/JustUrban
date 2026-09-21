@@ -1,0 +1,137 @@
+﻿@page
+@model JustUrban.Pages.SelectSlotModel
+@{
+    ViewData["Title"] = "Select Appointment Slot";
+}
+
+<link rel="stylesheet" href="https://jsdelivr.net">
+
+<style>
+    .slot-card {
+        border-radius: 24px;
+        border: 1px solid #edf2f7;
+        max-width: 650px;
+        background-color: #ffffff;
+    }
+    /* Style for modern interactive time pill buttons */
+    .time-radio {
+        display: none;
+    }
+
+    .time-label {
+        display: block;
+        padding: 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        background-color: #f8f9fa;
+    }
+
+        .time-label:hover {
+            border-color: #6b46e5;
+            background-color: #f3f0ff;
+        }
+
+    .time-radio:checked + .time-label {
+        border-color: #6b46e5;
+        background-color: #6b46e5;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(107, 70, 229, 0.2);
+    }
+
+    .brand-purple-btn {
+        background-color: #6b46e5;
+        color: #ffffff !important;
+        border-radius: 14px;
+        font-weight: 600;
+        height: 54px;
+        border: none;
+        transition: background-color 0.2s;
+    }
+
+        .brand-purple-btn:hover {
+            background-color: #5a36cb;
+        }
+
+    .form-control:focus {
+        border-color: #6b46e5;
+        box-shadow: 0 0 0 0.25rem rgba(107, 70, 229, 0.15);
+    }
+</style>
+
+<div class="container my-5 py-2 d-flex justify-content-center">
+    <div class="card slot-card p-4 p-md-5 shadow-sm w-100">
+
+        <!-- Back Navigation Option Links -->
+        <a asp-page="/Booking" class="text-decoration-none text-secondary small fw-bold mb-3 d-inline-block">
+            <i class="bi bi-arrow-left me-1"></i> Back to service details
+        </a>
+
+        <h3 class="fw-bold text-dark mb-2" style="letter-spacing: -0.5px;">Select Date & Time</h3>
+        <p class="text-muted small mb-4">Choose your preferred slot for the home makeover consultation visit.</p>
+
+        <form method="post">
+            <!-- Part 1: Modern Date Calendar Input Field -->
+            <div class="mb-4">
+                <label class="form-label small fw-bold text-secondary text-uppercase mb-2">
+                    <i class="bi bi-calendar-event me-1"></i> 1. Pick a Date
+                </label>
+                <input type="date" name="SelectedDate" id="appointmentDate" class="form-control form-control-lg rounded-3 fs-6" required />
+            </div>
+
+            <!-- Part 2: Interactive Dynamic Time Selector Options -->
+            <div class="mb-5">
+                <label class="form-label small fw-bold text-secondary text-uppercase mb-3">
+                    <i class="bi bi-clock me-1"></i> 2. Select Available Time
+                </label>
+
+                <div class="row g-3">
+                    <!-- Slot Option A -->
+                    <div class="col-12">
+                        <input type="radio" name="SelectedTime" id="slot1" value="Morning (08:00 AM - 12:00 PM)" class="time-radio" required />
+                        <label for="slot1" class="time-label d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-brightness-alt-high me-2"></i> Morning Slot</span>
+                            <span class="small opacity-75">08:00 AM - 12:00 PM</span>
+                        </label>
+                    </div>
+
+                    <!-- Slot Option B -->
+                    <div class="col-12">
+                        <input type="radio" name="SelectedTime" id="slot2" value="Afternoon (12:00 PM - 04:00 PM)" class="time-radio" />
+                        <label for="slot2" class="time-label d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-sun me-2"></i> Afternoon Slot</span>
+                            <span class="small opacity-75">12:00 PM - 04:00 PM</span>
+                        </label>
+                    </div>
+
+                    <!-- Slot Option C -->
+                    <div class="col-12">
+                        <input type="radio" name="SelectedTime" id="slot3" value="Evening (04:00 PM - 08:00 PM)" class="time-radio" />
+                        <label for="slot3" class="time-label d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-moon-stars me-2"></i> Evening Slot</span>
+                            <span class="small opacity-75">04:00 PM - 08:00 PM</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Confirmation Submission Action Button -->
+            <button type="submit" class="w-100 brand-purple-btn d-flex align-items-center justify-content-center fs-5 shadow-sm">
+                Confirm Selected Slot
+            </button>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Protect calendar selections from mapping past dates
+        document.addEventListener("DOMContentLoaded", function() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointmentDate').setAttribute('min', today);
+        });
+    </script>
+}

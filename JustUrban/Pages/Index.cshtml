@@ -1,0 +1,119 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<!-- Custom CSS Styles for Layout Enhancements -->
+<style>
+    .service-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+        background: #f8f9fa;
+        border: none;
+        border-radius: 12px;
+        min-height: 140px;
+    }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            background: #ffffff;
+        }
+
+    .stat-box {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+</style>
+
+<!-- Centered Layout Container -->
+<div class="container my-5 py-4">
+    <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+
+            <!-- Main Title Section -->
+            <h1 class="display-4 fw-bold text-dark mb-5" style="letter-spacing: -1px; line-height: 1.2;">
+                Home services at your doorstep
+            </h1>
+
+            <!-- Services Grid Box containing the 4 custom options -->
+            <div class="card p-4 shadow-sm border-0 bg-white mb-5" style="border-radius: 16px;">
+                <!-- Responsive Grid: 2 columns on mobile, 4 columns on medium/large displays -->
+                <div class="row row-cols-2 row-cols-md-4 g-3 text-center">
+
+                    <!-- Option 1: Painting -->
+                    <div class="col">
+                        <a asp-page="/Booking" class="text-decoration-none">
+                        <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center">
+                            <span class="fs-1 mb-2">🎨</span>
+                            <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Painting</small>
+                        </div>
+                        </a>
+                    </div>
+
+                    <!-- Option 2: Polishing -->
+                    <div class="col">
+                        <a asp-page="/Booking" class="text-decoration-none">
+                        <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center">
+                            <span class="fs-1 mb-2">✨</span>
+                            <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Polishing</small>
+                        </div>
+                        </a>
+                    </div>
+
+                    <!-- Option 3: Texture Paint -->
+                    <div class="col">
+                        <a asp-page="/Booking" class="text-decoration-none">
+                        <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center">
+                            <span class="fs-1 mb-2">🧱</span>
+                            <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Texture Paint</small>
+                        </div>
+                        </a>
+                    </div>
+
+                    <!-- Option 4: Waterproofing -->
+                    <div class="col">
+                        <a asp-page="/Booking" class="text-decoration-none">
+                        <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center">
+                            <span class="fs-1 mb-2">💧</span>
+                            <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Waterproofing</small>
+                        </div>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- REPLACED: Trust Statistics Section (Matches Screenshot Exactly) -->
+            <div class="stat-box mt-5 pt-2">
+                <div class="row justify-content-center align-items-center g-4">
+
+                    <!-- Stat 1: Service Rating -->
+                    <div class="col-6 col-sm-5 d-flex align-items-center justify-content-center text-start">
+                        <div class="me-3 text-dark">
+                            <i class="bi bi-star fs-1 fw-light"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold text-dark mb-0 lh-1 fs-2">4.8</h3>
+                            <small class="text-muted" style="font-size: 0.85rem;">Service Rating*</small>
+                        </div>
+                    </div>
+
+                    <!-- Stat 2: Customers Globally -->
+                    <div class="col-6 col-sm-5 d-flex align-items-center justify-content-center text-start border-start">
+                        <div class="me-3 text-dark">
+                            <i class="bi bi-people fs-1 fw-light"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold text-dark mb-0 lh-1 fs-2">1M+</h3>
+                            <small class="text-muted" style="font-size: 0.85rem;">Customers Globally*</small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

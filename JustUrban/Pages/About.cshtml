@@ -1,0 +1,101 @@
+﻿@page
+@model JustUrban.Pages.AboutModel
+@{
+    ViewData["Title"] = "About Us";
+}
+
+<!-- Custom Styles for visual polish -->
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://unsplash.com') center/cover no-repeat;
+        min-height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background-color:black;
+    }
+
+    .about-card {
+        border-radius: 16px;
+        border: none;
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        background: #f8f9fa;
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="container my-5">
+    <!-- Hero Banner Row -->
+    <div class="hero-section text-center text-white mb-5 shadow-sm p-4">
+        <div>
+            <h1 class="display-4 fw-bold mb-2">About Us</h1>
+            <p class="lead mb-0">Transforming spaces with precision and style</p>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card about-card shadow-sm p-4 p-md-5 bg-white">
+
+                <!-- Subtitle Indicator -->
+                <h6 class="text-primary fw-bold text-uppercase tracking-wider mb-2" style="letter-spacing: 1px;">
+                    BEST PAINTING AND POLISHING WOOD SERVICES IN BANGALORE
+                </h6>
+
+                <!-- Main Greeting Header -->
+                <h2 class="fw-bold text-dark mb-4 display-6">
+                    Welcome to Just Urban Painting
+                </h2>
+
+                <!-- Your Core Content Body -->
+                <p class="text-secondary fs-5 leading-relaxed mb-5">
+                    Professional home painting services are no longer difficult to find in Bangalore.
+                    Bangalore professional painters are now available through our company. Set decorates
+                    your business or private space in style with <strong>Just Urban Painting</strong>!
+                    To this grandeur, Just Urban Painting contributes home painters in Bangalore as well
+                    as serve wood polishing services.
+                </p>
+
+                <hr class="text-muted my-4">
+
+                <!-- Core Values Feature Highlights Grid -->
+                <div class="row pt-2 text-center text-md-start">
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <div class="d-flex flex-column align-items-center align-items-md-start">
+                            <div class="feature-icon text-primary">🎨</div>
+                            <h5 class="fw-bold text-dark">Expert Painters</h5>
+                            <p class="text-muted small mb-0">Skilled, trained professional technicians delivering seamless premium finishes.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <div class="d-flex flex-column align-items-center align-items-md-start">
+                            @* <div class="feature-icon text-success">✨</div> *@
+                            <div class="feature-icon text-success">✨</div>
+                            <h5 class="fw-bold text-dark">Wood Polishing</h5>
+                            <p class="text-muted small mb-0">Premium restoration treatment preserving the grandeur of architectural woodwork.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex flex-column align-items-center align-items-md-start">
+                            <div class="feature-icon text-warning">📍</div>
+                            <h5 class="fw-bold text-dark">Bangalore Wide</h5>
+                            <p class="text-muted small mb-0">Reliable local doorstep operations across residential and commercial zones.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
