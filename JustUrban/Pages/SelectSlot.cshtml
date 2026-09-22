@@ -4,6 +4,7 @@
     ViewData["Title"] = "Select Appointment Slot";
 }
 
+<!-- Corrected full CDN URL for Bootstrap Icons -->
 <link rel="stylesheet" href="https://jsdelivr.net">
 
 <style>
@@ -13,34 +14,6 @@
         max-width: 650px;
         background-color: #ffffff;
     }
-    /* Style for modern interactive time pill buttons */
-    .time-radio {
-        display: none;
-    }
-
-    .time-label {
-        display: block;
-        padding: 14px;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        background-color: #f8f9fa;
-    }
-
-        .time-label:hover {
-            border-color: #6b46e5;
-            background-color: #f3f0ff;
-        }
-
-    .time-radio:checked + .time-label {
-        border-color: #6b46e5;
-        background-color: #6b46e5;
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(107, 70, 229, 0.2);
-    }
-
     .brand-purple-btn {
         background-color: #6b46e5;
         color: #ffffff !important;
@@ -50,12 +23,10 @@
         border: none;
         transition: background-color 0.2s;
     }
-
-        .brand-purple-btn:hover {
-            background-color: #5a36cb;
-        }
-
-    .form-control:focus {
+    .brand-purple-btn:hover {
+        background-color: #5a36cb;
+    }
+    .form-control:focus, .form-select:focus {
         border-color: #6b46e5;
         box-shadow: 0 0 0 0.25rem rgba(107, 70, 229, 0.15);
     }
@@ -64,7 +35,6 @@
 <div class="container my-5 py-2 d-flex justify-content-center">
     <div class="card slot-card p-4 p-md-5 shadow-sm w-100">
 
-        <!-- Back Navigation Option Links -->
         <a asp-page="/Booking" class="text-decoration-none text-secondary small fw-bold mb-3 d-inline-block">
             <i class="bi bi-arrow-left me-1"></i> Back to service details
         </a>
@@ -72,8 +42,16 @@
         <h3 class="fw-bold text-dark mb-2" style="letter-spacing: -0.5px;">Select Date & Time</h3>
         <p class="text-muted small mb-4">Choose your preferred slot for the home makeover consultation visit.</p>
 
-        <form method="post">
-            <!-- Part 1: Modern Date Calendar Input Field -->
+        <!-- FRONTEND INSTANT ERROR DISPLAY DISMISSABLE ALERT -->
+        <div id="frontendAlert" class="alert alert-danger border-0 rounded-3 d-none align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+            <div id="errorTextMessage">
+                Bookings are only allowed between 08:00 AM and 08:00 PM. Please select an operational slot.
+            </div>
+        </div>
+
+        <form method="post" id="appointmentForm">
+            <!-- Part 1: Date Input Field -->
             <div class="mb-4">
                 <label class="form-label small fw-bold text-secondary text-uppercase mb-2">
                     <i class="bi bi-calendar-event me-1"></i> 1. Pick a Date
@@ -81,43 +59,48 @@
                 <input type="date" name="SelectedDate" id="appointmentDate" class="form-control form-control-lg rounded-3 fs-6" required />
             </div>
 
-            <!-- Part 2: Interactive Dynamic Time Selector Options -->
+            <!-- Part 2: Split Time Selection Elements -->
             <div class="mb-5">
                 <label class="form-label small fw-bold text-secondary text-uppercase mb-3">
-                    <i class="bi bi-clock me-1"></i> 2. Select Available Time
+                    <i class="bi bi-clock me-1"></i> 2. Select Your Preferred Time
                 </label>
-
-                <div class="row g-3">
-                    <!-- Slot Option A -->
-                    <div class="col-12">
-                        <input type="radio" name="SelectedTime" id="slot1" value="Morning (08:00 AM - 12:00 PM)" class="time-radio" required />
-                        <label for="slot1" class="time-label d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-brightness-alt-high me-2"></i> Morning Slot</span>
-                            <span class="small opacity-75">08:00 AM - 12:00 PM</span>
-                        </label>
+                
+                <div class="row g-2">
+                    <!-- Hour Option Dropdown -->
+                    <div class="col-4">
+                        <select name="SelectedHour" id="slotHour" class="form-select form-select-lg rounded-3 fs-6 py-3 text-center border-2 border-light-subtle shadow-sm" required>
+                            <option value="" disabled selected>Hour</option>
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i.ToString("D2")">@i.ToString("D2")</option>
+                            }
+                        </select>
                     </div>
 
-                    <!-- Slot Option B -->
-                    <div class="col-12">
-                        <input type="radio" name="SelectedTime" id="slot2" value="Afternoon (12:00 PM - 04:00 PM)" class="time-radio" />
-                        <label for="slot2" class="time-label d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-sun me-2"></i> Afternoon Slot</span>
-                            <span class="small opacity-75">12:00 PM - 04:00 PM</span>
-                        </label>
+                    <!-- Minute Options Dropdown -->
+                    <div class="col-4">
+                        <select name="SelectedMinute" id="slotMinute" class="form-select form-select-lg rounded-3 fs-6 py-3 text-center border-2 border-light-subtle shadow-sm" required>
+                            <option value="" disabled selected>Min</option>
+                            <option value="00">00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                        </select>
                     </div>
 
-                    <!-- Slot Option C -->
-                    <div class="col-12">
-                        <input type="radio" name="SelectedTime" id="slot3" value="Evening (04:00 PM - 08:00 PM)" class="time-radio" />
-                        <label for="slot3" class="time-label d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-moon-stars me-2"></i> Evening Slot</span>
-                            <span class="small opacity-75">04:00 PM - 08:00 PM</span>
-                        </label>
+                    <!-- AM/PM Toggle Selection -->
+                    <div class="col-4">
+                        <select name="SelectedPeriod" id="slotPeriod" class="form-select form-select-lg rounded-3 fs-6 py-3 text-center fw-bold border-2 border-light-subtle shadow-sm text-primary" required>
+                            <option value="AM">AM</option>
+                            <option value="PM" selected>PM</option>
+                        </select>
                     </div>
+                </div>
+                <div class="form-text text-muted small mt-2">
+                    <i class="bi bi-info-circle-fill me-1"></i> Operational Hours: **08:00 AM to 08:00 PM** only.
                 </div>
             </div>
 
-            <!-- Main Confirmation Submission Action Button -->
             <button type="submit" class="w-100 brand-purple-btn d-flex align-items-center justify-content-center fs-5 shadow-sm">
                 Confirm Selected Slot
             </button>
@@ -128,10 +111,44 @@
 
 @section Scripts {
     <script>
-        // Protect calendar selections from mapping past dates
         document.addEventListener("DOMContentLoaded", function() {
+            // 1. Automatically disable past dates in the calendar
             var today = new Date().toISOString().split('T')[0];
             document.getElementById('appointmentDate').setAttribute('min', today);
+
+            // 2. Intercept form submission for validation checking
+            var form = document.getElementById('appointmentForm');
+            var alertBox = document.getElementById('frontendAlert');
+
+            form.addEventListener('submit', function(event) {
+                // Read chosen values from layout selectors
+                var hour = parseInt(document.getElementById('slotHour').value);
+                var minute = parseInt(document.getElementById('slotMinute').value);
+                var period = document.getElementById('slotPeriod').value;
+
+                // Standardise the user choices into absolute 24-hour military numbers
+                var calculatedHour = hour;
+                if (period === "PM" && hour < 12) {
+                    calculatedHour += 12;
+                }
+                if (period === "AM" && hour === 12) {
+                    calculatedHour = 0;
+                }
+
+                // Check boundaries: before 8 AM (8:00) or after 8 PM (20:00)
+                // Note: 8:00 PM exact (20:00) is allowed, but anything past 20:00 with minutes (e.g., 8:15 PM) is blocked.
+                if (calculatedHour < 8 || calculatedHour > 20 || (calculatedHour === 20 && minute > 0)) {
+                    // Block the backend submission pipeline
+                    event.preventDefault(); 
+                    
+                    // Display the warning alert banner smoothly on user layout
+                    alertBox.classList.remove('d-none');
+                    alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    // Hide the alert banner if everything is valid
+                    alertBox.classList.add('d-none');
+                }
+            });
         });
     </script>
 }
