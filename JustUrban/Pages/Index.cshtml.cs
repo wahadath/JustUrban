@@ -1,53 +1,69 @@
+using JustUrban.Data;
+using JustUrban.Models;
+using JustUrban.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Http;
-using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace JustUrban.Pages
 {
     public class IndexModel : PageModel
     {
-        public void OnGet()
+        private readonly AppDbContext _db;
+
+        public IndexModel(AppDbContext db)
         {
-            // Initial render state logic
+            _db = db;
         }
 
-        // Action triggered by your modal phone form submission
-        public IActionResult OnPostSendOtp(string PhoneNumber)
+        public void OnGet()
         {
-            // Fallback safety check for null parameters
-            if (string.IsNullOrEmpty(PhoneNumber))
+        }
+
+        public async Task<IActionResult> OnPostVerifyOtp(string FullPhoneNumber, string OtpCode)
+        {
+            if (OtpCode != "1234")
             {
-                return Page();
-            }
-
-            // SIMULATION: If the user provides your specified mock input "1234"
-            if (PhoneNumber.Trim() == "1234")
-            {
-                CookieOptions options = new CookieOptions
-                {
-                    Expires = DateTime.Now.AddDays(1),
-                    HttpOnly = true, // Secures cookie accessibility profiles
-                    IsEssential = true
-                };
-
-                // Append the authorization state marker flags
-                Response.Cookies.Append("IsLoggedIn", "true", options);
-
-                // Redirect straight back to your index page to reload the layout with the user icon visible
+                TempData["OpenLogin"] = "true";
+                TempData["LoginError"] = "Invalid OTP. Use 1234 for this demo.";
                 return RedirectToPage("/Index");
             }
 
-            // Fallback if anything else is entered (Keeps modal workflow open)
-            return Page();
-        }
+            var normalized = AuthSession.NormalizePhone(FullPhoneNumber);
+            if (normalized.Length < 10)
+            {
+                TempData["OpenLogin"] = "true";
+                TempData["LoginError"] = "Enter a valid 10-digit phone number.";
+                return RedirectToPage("/Index");
+            }
 
-        // Action triggered when hitting the "Log Out" item under your new profile icon dropdown menu selection
-        public IActionResult OnPostLogout()
-        {
-            // Revoke authentication markers by clearing cookies
-            Response.Cookies.Delete("IsLoggedIn");
-            return RedirectToPage("/Index");
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.PhoneNumber == normalized);
+            if (user == null)
+            {
+                user = new AppUser
+                {
+                    PhoneNumber = normalized,
+                    PhoneDisplay = FullPhoneNumber.Trim(),
+                    CreatedAt = DateTime.UtcNow
+                };
+                _db.Users.Add(user);
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                user.PhoneDisplay = FullPhoneNumber.Trim();
+                await _db.SaveChangesAsync();
+            }
+
+            AuthSession.SignIn(Request, Response, user);
+            BookingFlow.KeepBookingTempData(TempData);
+
+            if (TempData.ContainsKey("UserPickedDate"))
+            {
+                return RedirectToPage("/Billing");
+            }
+
+            return RedirectToPage("/Profile");
         }
     }
 }

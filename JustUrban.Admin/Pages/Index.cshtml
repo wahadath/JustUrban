@@ -1,0 +1,39 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1 class="fw-bold mb-4">Dashboard</h1>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card stat-card shadow-sm p-4">
+            <div class="text-muted small">Total bookings</div>
+            <div class="fs-2 fw-bold">@Model.TotalBookings</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card shadow-sm p-4">
+            <div class="text-muted small">Waiting for vendor</div>
+            <div class="fs-2 fw-bold">@Model.PendingAssignment</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card shadow-sm p-4">
+            <div class="text-muted small">Completed</div>
+            <div class="fs-2 fw-bold">@Model.Completed</div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card stat-card shadow-sm p-4">
+            <div class="text-muted small">Vendors</div>
+            <div class="fs-2 fw-bold">@Model.VendorCount</div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card stat-card shadow-sm p-4">
+            <div class="text-muted small">Customers</div>
+            <div class="fs-2 fw-bold">@Model.CustomerCount</div>
+        </div>
+    </div>
+</div>

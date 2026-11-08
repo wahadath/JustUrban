@@ -43,7 +43,7 @@
 <div class="container my-5 py-4 d-flex justify-content-center">
     <div class="card booking-card p-4 p-md-5 shadow-sm w-100">
 
-        <h2 class="fw-bold text-dark mb-4 pb-2 fs-3" style="letter-spacing: -0.5px;">Home Makeover</h2>
+        <h2 class="fw-bold text-dark mb-4 pb-2 fs-3" style="letter-spacing: -0.5px;">@Model.ServiceDisplayName</h2>
 
         <div class="d-flex flex-column gap-4 mb-5">
             <!-- Feature Item 1 -->
@@ -69,7 +69,7 @@
         </div>
 
         <!-- Clicking this button now navigates directly to the dedicated Slot Calendar Page -->
-        <a asp-page="/SelectSlot" class="w-100 brand-purple-btn d-flex align-items-center justify-content-center fs-5 shadow-sm">
+        <a asp-page="/SelectSlot" asp-route-service="@Model.Service" class="w-100 brand-purple-btn d-flex align-items-center justify-content-center fs-5 shadow-sm">
             Book Consultation at ₹49
         </a>
 

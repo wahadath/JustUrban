@@ -1,57 +1,111 @@
+using JustUrban.Data;
+using JustUrban.Models;
+using JustUrban.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace JustUrban.Pages
 {
     public class paymentModel : PageModel
     {
-        public void OnGet()
+        private readonly AppDbContext _db;
+
+        public paymentModel(AppDbContext db)
         {
-            // Page initialization
+            _db = db;
         }
 
-        public IActionResult OnPost(string paymentMethod)
+        public void OnGet()
         {
-            // Explicitly tracking our target price point
+            BookingFlow.KeepBookingTempData(TempData);
+        }
+
+        public async Task<IActionResult> OnPostAsync(string paymentMethod)
+        {
             const decimal amount = 49.00m;
 
             try
             {
+                if (paymentMethod != "Online" && paymentMethod != "Offline")
+                {
+                    TempData["PopupType"] = "Failure";
+                    TempData["PopupMessage"] = "Please choose a payment method.";
+                    BookingFlow.KeepBookingTempData(TempData);
+                    return RedirectToPage();
+                }
+
                 if (paymentMethod == "Online")
                 {
-                    // SIMULATION: In real-life, you would call your Payment Gateway API here.
-                    // For testing purposes, we will simulate a successful digital authorization:
                     bool isGatewayTransactionSuccessful = true;
-
-                    if (isGatewayTransactionSuccessful)
-                    {
-                        TempData["PopupType"] = "Success";
-                        TempData["PopupMessage"] = "Online Payment of ₹49.00 received successfully! Your booking is secured.";
-                    }
-                    else
+                    if (!isGatewayTransactionSuccessful)
                     {
                         TempData["PopupType"] = "Failure";
                         TempData["PopupMessage"] = "The bank rejected your online transaction. Please check your balance and try again.";
+                        BookingFlow.KeepBookingTempData(TempData);
+                        return RedirectToPage();
                     }
                 }
-                else if (paymentMethod == "Offline")
+
+                DateTime.TryParse(TempData["UserPickedDate"]?.ToString(), out var slotDate);
+                if (slotDate == default)
                 {
-                    // SIMULATION: Save record to your local database file as 'Pay at Desk / COD'
-                    // Database.SaveOrder(amount, "Offline", "Pending");
-
-                    TempData["PopupType"] = "Success";
-                    TempData["PopupMessage"] = "Booking confirmed! Please keep exactly ₹49.00 cash ready at your slot timing.";
+                    slotDate = DateTime.Today;
                 }
-            }
-            catch (System.Exception ex)
-            {
-                // Fallback catch-all error handling
-                TempData["PopupType"] = "Failure";
-                TempData["PopupMessage"] = $"An unexpected system error occurred: {ex.Message}";
-            }
 
-            // Reload the same page so the system can safely render the pop-up notification modal
-            return RedirectToPage();
+                // 1. Retrieve logged-in UserId
+                int? userId = AuthSession.UserId(Request);
+
+                // 2. Fallback to TempData if AuthSession isn't set
+                if (userId == null && TempData["UserId"] != null)
+                {
+                    if (int.TryParse(TempData["UserId"]?.ToString(), out int parsedId))
+                    {
+                        userId = parsedId;
+                    }
+                }
+
+                // 3. Secondary Fallback: Match by ContactNumber if UserId is still null
+                string contactNumber = TempData["ContactNumber"]?.ToString() ?? string.Empty;
+                if (userId == null && !string.IsNullOrEmpty(contactNumber))
+                {
+                    string normalized = AuthSession.NormalizePhone(contactNumber);
+                    var matchedUser = await _db.Users.FirstOrDefaultAsync(u => u.PhoneNumber == normalized);
+                    if (matchedUser != null)
+                    {
+                        userId = matchedUser.Id;
+                    }
+                }
+
+                var booking = new Booking
+                {
+                    UserId = userId, // Assigning Foreign Key to prevent NULL
+                    ServiceName = TempData["ServiceName"]?.ToString() ?? "Home Makeover",
+                    CustomerName = TempData["CustomerName"]?.ToString() ?? "",
+                    ContactNumber = contactNumber,
+                    City = TempData["City"]?.ToString(),
+                    Pincode = TempData["Pincode"]?.ToString(),
+                    StreetAddress = TempData["StreetAddress"]?.ToString(),
+                    SlotDate = slotDate.Date,
+                    SlotTime = TempData["UserPickedTime"]?.ToString() ?? "",
+                    PaymentMethod = paymentMethod,
+                    Amount = amount,
+                    Status = "Confirmed",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _db.Bookings.Add(booking);
+                await _db.SaveChangesAsync();
+
+                return RedirectToPage("/Tracking", new { id = booking.Id });
+            }
+            catch (Exception ex)
+            {
+                TempData["PopupType"] = "Failure";
+                TempData["PopupMessage"] = $"Could not save your booking: {ex.Message}";
+                BookingFlow.KeepBookingTempData(TempData);
+                return RedirectToPage();
+            }
         }
     }
 }

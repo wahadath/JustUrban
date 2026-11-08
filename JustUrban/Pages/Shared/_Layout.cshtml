@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - JustUrban</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/JustUrban.styles.css" asp-append-version="true" />
-    <!-- Added Bootstrap Icons for the phone logo -->
-    <link rel="stylesheet" href="https://jsdelivr.net">
+<link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/JustUrban.styles.css" asp-append-version="true" />
 </head>
 <body>
     <!-- HEADER SECTION -->
     <header>
-        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom py-3">
+        <nav class="navbar navbar-expand-md navbar-light border-0 py-3">
             <div class="container">
                 <!-- Brand Logo (Stays Left) -->
                 <a class="navbar-brand fw-bold fs-3 text-dark" asp-area="" asp-page="/Index">JustUrban</a>
@@ -33,23 +32,41 @@
         <a class="nav-link text-secondary fw-medium" asp-area="" asp-page="/About">About Us</a>
     </li>
     <li class="nav-item">
+        <a class="nav-link text-secondary fw-medium" asp-page="/MyBookings">My Bookings</a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link text-secondary fw-medium" asp-area="" asp-page="/Contact">Contact Us</a>
     </li>
 
     @if (Context.Request.Cookies["IsLoggedIn"] == "true")
     {
-        <!-- Dynamic User Profile Icon shown instead of Log In -->
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark fw-bold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px;">
-                    👤
-                </div>
-                <span>Profile</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3" aria-labelledby="userDropdown">
-                <li><a class="dropdown-item py-2" asp-page="/Index" asp-page-handler="Logout">🚪 Log Out</a></li>
-            </ul>
-        </li>
+       <li class="nav-item dropdown">
+    @{
+        var displayName = Context.Request.Cookies["UserName"];
+        var navLabel = "Account";
+        if (!string.IsNullOrWhiteSpace(displayName))
+        {
+            navLabel = displayName.Trim().Split(' ')[0];
+        }
+        var navPhone = Context.Request.Cookies["UserPhone"];
+    }
+    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark fw-bold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="rounded-circle bg-light text-dark d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px;">
+            <i class="bi bi-person-fill fs-5" style="color: #000 !important;"></i>
+        </div>
+        <span>@navLabel</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3" aria-labelledby="userDropdown">
+        @if (!string.IsNullOrWhiteSpace(navPhone))
+        {
+            <li><h6 class="dropdown-header">@navPhone</h6></li>
+        }
+        <li><a class="dropdown-item py-2" asp-page="/Profile">My Profile</a></li>
+        <li><a class="dropdown-item py-2" asp-page="/MyBookings">My Bookings</a></li>
+        <li><hr class="dropdown-divider" /></li>
+        <li><a class="dropdown-item py-2" asp-page="/Logout">Log Out</a></li>
+    </ul>
+</li>
     }
     else
     {
@@ -75,72 +92,117 @@
         </main>
     </div>
 
-    <!-- POPUP LOGIN MODAL (Matches screenshot UI precisely) -->
+    <!-- POPUP LOGIN MODAL (Multi-step with 4-Digit OTP) -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
             <div class="modal-content border-0 p-4 shadow" style="border-radius: 24px; position: relative;">
 
-                <!-- Close Button positioned on top right outside the container card -->
+                <!-- Close Button -->
                 <button type="button" class="btn-close bg-white rounded-circle p-2 shadow-sm position-absolute"
                         data-bs-dismiss="modal" aria-label="Close"
                         style="top: -50px; right: 0; opacity: 1;"></button>
 
                 <div class="modal-body p-2">
-                    <!-- Phone Icon Logo -->
-                    <div class="text-primary mb-3">
-                        <i class="bi bi-telephone-fill fs-2 p-2 bg-light rounded-3 d-inline-block text-primary" style="color: #2b6cb0 !important;"></i>
-                    </div>
 
-                    <!-- Headers -->
-                    <h3 class="fw-bold text-dark mb-2" id="loginModalLabel" style="letter-spacing: -0.5px;">Enter your phone number</h3>
-                    <p class="text-muted small mb-4">We'll send you a text with a verification code. Standard tariff may apply.</p>
-
-                    <!-- Input Fields Form Group -->
-                    <form method="post" asp-page="/Index" asp-page-handler="SendOtp">
-                        <div class="input-group mb-4 border rounded-3 overflow-hidden" style="height: 54px;">
-                            <!-- Country Code Dropdown selector selection -->
-                            <button class="btn btn-light bg-white text-dark border-0 px-3 dropdown-toggle fw-medium" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                +91
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-menu-item dropdown-item" href="#">+91 (IN)</a></li>
-                                <li><a class="dropdown-menu-item dropdown-item" href="#">+1 (US)</a></li>
-                                <li><a class="dropdown-menu-item dropdown-item" href="#">+44 (UK)</a></li>
-                            </ul>
-
-                            <!-- Vertical Partition line separator -->
-                            <div class="vr my-auto text-muted" style="height: 24px;"></div>
-
-                            <!-- Phone text field -->
-                            <input type="tel" name="PhoneNumber" class="form-control border-0 bg-transparent shadow-none ps-3"
-                                   placeholder="Enter your phone number" required autocomplete="off" />
+                    <!-- STEP 1: ENTER PHONE NUMBER -->
+                    <div id="otpStep1">
+                        <div class="text-primary mb-3">
+                            <i class="bi bi-telephone-fill fs-2 p-2 bg-light rounded-3 d-inline-block text-primary" style="color: #2b6cb0 !important;"></i>
                         </div>
 
-                        <!-- Continue Button Submission handler pointer -->
-                        <button type="submit" class="w-100 btn py-2 fw-medium text-muted bg-light border-0"
-                                style="border-radius: 12px; height: 48px; background-color: #e2e8f0 !important;">
-                            Continue
-                        </button>
-                    </form>
+                        <h3 class="fw-bold text-dark mb-2" id="loginModalLabel" style="letter-spacing: -0.5px;">Enter your phone number</h3>
+                        <p class="text-muted small mb-4">We'll send you a text with a verification code. Standard tariff may apply.</p>
+                        @if (TempData["LoginError"] != null)
+                        {
+                            <div class="alert alert-danger border-0 rounded-3 small">@TempData["LoginError"]</div>
+                        }
 
-                    <!-- Bottom Terms & Policy Disclaimer Links -->
-                    <div class="text-center mt-4 pt-2">
-                        <p class="text-secondary mb-0" style="font-size: 0.78rem;">
-                            By continuing, you agree to our <a href="/Terms" class="text-dark fw-bold text-decoration-underline">T&C</a> and <a href="/Privacy" class="text-dark fw-bold text-decoration-underline">Privacy policy</a>.
-                        </p>
+                        <form id="phoneForm" onsubmit="handleSendOtp(event)">
+                            <div class="input-group mb-4 border rounded-3 overflow-hidden" style="height: 54px;">
+                                <button class="btn btn-light bg-white text-dark border-0 px-3 dropdown-toggle fw-medium" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="selectedCountryCode">
+                                    +91
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="selectCountryCode('+91')">+91 (IN)</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="selectCountryCode('+1')">+1 (US)</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="selectCountryCode('+44')">+44 (UK)</a></li>
+                                </ul>
+
+                                <div class="vr my-auto text-muted" style="height: 24px;"></div>
+
+                                <input type="tel" id="phoneNumberInput" name="PhoneNumber" class="form-control border-0 bg-transparent shadow-none ps-3"
+                                       placeholder="Enter your phone number" required autocomplete="off" maxlength="10" />
+                            </div>
+
+                            <button type="submit" class="w-100 btn py-2 fw-medium text-white bg-dark border-0"
+                                    style="border-radius: 12px; height: 48px;">
+                                Continue
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-4 pt-2">
+                            <p class="text-secondary mb-0" style="font-size: 0.78rem;">
+                                By continuing, you agree to our <a href="/Terms" class="text-dark fw-bold text-decoration-underline">T&C</a> and <a href="/Privacy" class="text-dark fw-bold text-decoration-underline">Privacy policy</a>.
+                            </p>
+                        </div>
                     </div>
-                </div>
 
+                    <!-- STEP 2: ENTER 4-DIGIT VERIFICATION CODE -->
+                    <div id="otpStep2" class="d-none">
+                        <!-- Chat / Message Icon -->
+                        <div class="text-primary mb-3">
+                            <div class="p-2 bg-light rounded-3 d-inline-block text-primary" style="color: #2b6cb0 !important;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-chat-dots-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8c0 3.866-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <h3 class="fw-bold text-dark mb-2" style="letter-spacing: -0.5px;">Enter verification code</h3>
+                        <p class="text-muted small mb-4">A 4-digit verification code has been sent to <span id="displayPhoneNumber" class="fw-semibold text-dark"></span>. For this demo, enter <strong>1234</strong>.</p>
+
+                        <form method="post" asp-page="/Index" asp-page-handler="VerifyOtp">
+                            <!-- Hidden Inputs for Form Submission -->
+                            <input type="hidden" name="FullPhoneNumber" id="hiddenFullPhone" />
+                            <input type="hidden" name="OtpCode" id="hiddenOtpCode" />
+
+                            <!-- 4-Digit Input Box Grid -->
+                            <div class="d-flex justify-content-between gap-2 mb-4">
+                                <input type="text" class="form-control text-center fs-4 fw-bold otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" required style="height: 56px; border-radius: 12px;" />
+                                <input type="text" class="form-control text-center fs-4 fw-bold otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" required style="height: 56px; border-radius: 12px;" />
+                                <input type="text" class="form-control text-center fs-4 fw-bold otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" required style="height: 56px; border-radius: 12px;" />
+                                <input type="text" class="form-control text-center fs-4 fw-bold otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" required style="height: 56px; border-radius: 12px;" />
+                            </div>
+
+                            <!-- Timer and Resend Option -->
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <span class="text-muted small d-flex align-items-center gap-1">
+                                    ⏱️ <span id="timerText">00:30</span>
+                                </span>
+                                <button type="button" id="resendBtn" class="btn btn-link p-0 text-decoration-none small text-muted" disabled onclick="resendOtp()">
+                                    Resend Code
+                                </button>
+                            </div>
+
+                            <button type="submit" id="verifySubmitBtn" class="w-100 btn py-2 fw-medium text-white bg-dark border-0"
+                                    style="border-radius: 12px; height: 48px;" disabled>
+                                Login
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
 
+    
     <!-- FOOTER SECTION -->
-    <footer class="border-top footer text-muted position-fixed bottom-0 w-100 bg-white py-3">
-        <div class="container">
-            &copy; 2022 - Just Urban Painting - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>
+    <footer class="footer w-100 py-3">
+    <div class="container text-center">
+        &copy; 2022 - Just Urban Painting - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    </div>
+</footer>
 
     <!-- JAVASCRIPT ASSETS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -148,5 +210,137 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+            let timerInterval;
+
+            function selectCountryCode(code) {
+                document.getElementById('selectedCountryCode').innerText = code;
+            }
+
+            function handleSendOtp(event) {
+                event.preventDefault();
+
+                const countryCode = document.getElementById('selectedCountryCode').innerText.trim();
+                const phone = document.getElementById('phoneNumberInput').value.trim();
+
+                if (!phone) return;
+
+                const fullPhone = `${countryCode} ${phone}`;
+                document.getElementById('displayPhoneNumber').innerText = fullPhone;
+                document.getElementById('hiddenFullPhone').value = fullPhone;
+
+                // Optionally send an AJAX call to your C# SendOtp handler here:
+                /*
+                fetch('/Index?handler=SendOtp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ PhoneNumber: fullPhone })
+                });
+                */
+
+                // Switch to Step 2
+                document.getElementById('otpStep1').classList.add('d-none');
+                document.getElementById('otpStep2').classList.remove('d-none');
+
+                // Focus first OTP input and start timer
+                const inputs = document.querySelectorAll('.otp-input');
+                inputs[0].focus();
+                startTimer(30);
+            }
+
+            // Timer Implementation
+            function startTimer(seconds) {
+                let timeLeft = seconds;
+                const timerText = document.getElementById('timerText');
+                const resendBtn = document.getElementById('resendBtn');
+                resendBtn.disabled = true;
+                resendBtn.classList.add('text-muted');
+                resendBtn.classList.remove('text-primary');
+
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    const formatted = timeLeft < 10 ? `00:0${timeLeft}` : `00:${timeLeft}`;
+                    timerText.innerText = formatted;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        timerText.innerText = "00:00";
+                        resendBtn.disabled = false;
+                        resendBtn.classList.remove('text-muted');
+                        resendBtn.classList.add('text-primary', 'fw-semibold');
+                    }
+                    timeLeft--;
+                }, 1000);
+            }
+
+            function resendOtp() {
+                startTimer(30);
+                // Add AJAX trigger for resending code here if required
+            }
+
+            // Auto-focus transitions & Copy-Paste support across 4 inputs
+            document.addEventListener('DOMContentLoaded', function () {
+                const otpInputs = document.querySelectorAll('.otp-input');
+                const verifyBtn = document.getElementById('verifySubmitBtn');
+                const hiddenOtpField = document.getElementById('hiddenOtpCode');
+
+                otpInputs.forEach((input, index) => {
+                    // Focus next box on keyup
+                    input.addEventListener('input', (e) => {
+                        if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                            otpInputs[index + 1].focus();
+                        }
+                        checkOtpComplete();
+                    });
+
+                    // Handle backspace navigation
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                            otpInputs[index - 1].focus();
+                        }
+                    });
+
+                    // Handle paste action
+                    input.addEventListener('paste', (e) => {
+                        const pasteData = e.clipboardData.getData('text').trim();
+                        if (/^\d{4}$/.test(pasteData)) {
+                            e.preventDefault();
+                            pasteData.split('').forEach((char, i) => {
+                                if (otpInputs[i]) otpInputs[i].value = char;
+                            });
+                            otpInputs[otpInputs.length - 1].focus();
+                            checkOtpComplete();
+                        }
+                    });
+                });
+
+                function checkOtpComplete() {
+                    let combinedOtp = '';
+                    otpInputs.forEach(i => combinedOtp += i.value);
+                    hiddenOtpField.value = combinedOtp;
+
+                    if (combinedOtp.length === 4) {
+                        verifyBtn.disabled = false;
+                    } else {
+                        verifyBtn.disabled = true;
+                    }
+                }
+
+                // Reset modal view when modal is closed
+                const modal = document.getElementById('loginModal');
+                modal.addEventListener('hidden.bs.modal', function () {
+                    document.getElementById('otpStep1').classList.remove('d-none');
+                    document.getElementById('otpStep2').classList.add('d-none');
+                    document.getElementById('phoneForm').reset();
+                    otpInputs.forEach(i => i.value = '');
+                    clearInterval(timerInterval);
+                });
+
+                if ('@TempData["OpenLogin"]' === 'true') {
+                    new bootstrap.Modal(modal).show();
+                }
+            });
+    </script>
 </body>
 </html>

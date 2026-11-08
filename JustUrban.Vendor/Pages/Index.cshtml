@@ -1,0 +1,48 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "My jobs";
+}
+
+<h1 class="fw-bold mb-4">My jobs</h1>
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <div class="alert alert-success">@Model.Message</div>
+}
+@if (Model.Jobs.Count == 0)
+{
+    <div class="alert alert-info">No jobs assigned yet. Ask admin to assign a booking to you.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var job in Model.Jobs)
+        {
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm p-4 h-100">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="fw-bold mb-1">@job.ServiceName</h5>
+                        <span class="badge text-bg-secondary">@job.Status</span>
+                    </div>
+                    <p class="mb-1">@job.CustomerName · @job.ContactNumber</p>
+                    <p class="text-muted small mb-2">@job.StreetAddress, @job.City @job.Pincode</p>
+                    <p class="fw-semibold">@job.FormattedSlot</p>
+                    @if (job.Status is "Partner Assigned" or "Assigned")
+                    {
+                        <form method="post" asp-page-handler="Start">
+                            <input type="hidden" name="id" value="@job.Id" />
+                            <button class="btn btn-outline-success" type="submit">Start job</button>
+                        </form>
+                    }
+                    else if (job.Status == "In Progress")
+                    {
+                        <form method="post" asp-page-handler="Complete">
+                            <input type="hidden" name="id" value="@job.Id" />
+                            <button class="btn btn-success" type="submit">Mark completed</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

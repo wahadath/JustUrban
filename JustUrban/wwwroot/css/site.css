@@ -2,6 +2,33 @@ html {
   font-size: 14px;
 }
 
+header nav.navbar,
+footer {
+  background-color: #2a9ccf;
+  background-image: none;
+  box-shadow: none;
+  color: #f7f4ee;
+}
+
+header .navbar-brand {
+  color: #f7f4ee !important;
+  letter-spacing: 0.04em;
+}
+
+header .nav-link {
+  color: rgba(247, 244, 238, 0.88) !important;
+  letter-spacing: 0.03em;
+}
+
+header .nav-link:hover {
+  color: #f3e2b6 !important;
+}
+
+footer a {
+  color: #f3e2b6;
+  font-weight: 600;
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;

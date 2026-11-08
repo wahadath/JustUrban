@@ -1,0 +1,86 @@
+@page "{id:int}"
+@model JustUrban.Pages.TrackingModel
+@{
+    ViewData["Title"] = "Track booking";
+    var booking = Model.Booking!;
+    var statusClass = booking.Status switch
+    {
+        "Cancelled" => "bg-danger",
+        "Rescheduled" => "bg-warning text-dark",
+        "Completed" => "bg-success",
+        _ => "bg-primary"
+    };
+}
+
+<style>
+    .track-card {
+        border-radius: 24px;
+        border: 1px solid #edf2f7;
+        max-width: 650px;
+        background-color: #ffffff;
+    }
+    .brand-purple-btn {
+        background-color: #6b46e5;
+        color: #6b46e5;
+        border-radius: 14px;
+        font-weight: 600;
+        height: 48px;
+        border: none;
+    }
+    .brand-outline-btn {
+        border: 1px solid #6b46e5;
+        color: #6b46e5;
+        border-radius: 14px;
+        font-weight: 600;
+        height: 48px;
+        background: #fff;
+    }
+</style>
+
+<div class="container my-5 py-2 d-flex justify-content-center">
+    <div class="card track-card p-4 p-md-5 shadow-sm w-100">
+        <a asp-page="/MyBookings" class="text-decoration-none text-secondary small fw-bold mb-3 d-inline-block">
+            <i class="bi bi-arrow-left me-1"></i> My bookings
+        </a>
+
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h3 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">@booking.ServiceName</h3>
+                <p class="text-muted small mb-0">Booking #@booking.Id</p>
+            </div>
+            <span class="badge @statusClass rounded-pill px-3 py-2">@booking.Status</span>
+        </div>
+
+        <div class="bg-light rounded-3 p-3 mb-4">
+            <p class="mb-2"><i class="bi bi-calendar-event me-2"></i>@booking.SlotDate.ToString("dd MMM yyyy") · @booking.SlotTime</p>
+            <p class="mb-2"><i class="bi bi-geo-alt me-2"></i>@(booking.StreetAddress), @(booking.City) @(booking.Pincode)</p>
+            <p class="mb-2"><i class="bi bi-person me-2"></i>@booking.CustomerName · @booking.ContactNumber</p>
+            <p class="mb-0"><i class="bi bi-credit-card me-2"></i>₹@booking.Amount.ToString("0.00") · @booking.PaymentMethod</p>
+        </div>
+
+        <h6 class="fw-bold mb-3">Tracking</h6>
+        <ul class="list-unstyled mb-4">
+            <li class="mb-2">@(booking.Status == "Cancelled" ? "○" : "●") Booking confirmed</li>
+            <li class="mb-2">@(booking.Status == "Rescheduled" ? "●" : "○") Slot updated</li>
+            <li class="mb-2">○ Professional assigned</li>
+            <li class="mb-2">@(booking.Status == "Cancelled" ? "● Cancelled" : "○ Service in progress")</li>
+        </ul>
+
+        @if (booking.CanModify)
+        {
+            <div class="d-grid gap-2">
+                <a asp-page="/SelectSlot" asp-route-bookingId="@booking.Id" class="btn brand-purple-btn d-flex align-items-center justify-content-center">
+                    Reschedule
+                </a>
+                <form method="post" asp-page-handler="Cancel" asp-route-id="@booking.Id"
+                      onsubmit="return confirm('Cancel this booking?');">
+                    <button type="submit" class="btn brand-outline-btn w-100">Cancel booking</button>
+                </form>
+            </div>
+        }
+        else if (booking.Status == "Cancelled")
+        {
+            <p class="text-danger fw-semibold mb-0">This booking has been cancelled.</p>
+        }
+    </div>
+</div>

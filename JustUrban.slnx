@@ -1,3 +1,6 @@
 <Solution>
   <Project Path="JustUrban/JustUrban.csproj" />
+  <Project Path="JustUrban.Data/JustUrban.Data.csproj" />
+  <Project Path="JustUrban.Admin/JustUrban.Admin.csproj" />
+  <Project Path="JustUrban.Vendor/JustUrban.Vendor.csproj" />
 </Solution>

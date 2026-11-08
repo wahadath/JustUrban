@@ -35,12 +35,21 @@
 <div class="container my-5 py-2 d-flex justify-content-center">
     <div class="card slot-card p-4 p-md-5 shadow-sm w-100">
 
-        <a asp-page="/Booking" class="text-decoration-none text-secondary small fw-bold mb-3 d-inline-block">
-            <i class="bi bi-arrow-left me-1"></i> Back to service details
-        </a>
+        @if (Model.IsReschedule)
+        {
+            <a asp-page="/Tracking" asp-route-id="@Model.BookingId" class="text-decoration-none text-secondary small fw-bold mb-3 d-inline-block">
+                <i class="bi bi-arrow-left me-1"></i> Back to tracking
+            </a>
+        }
+        else
+        {
+            <a asp-page="/Booking" class="text-decoration-none text-secondary small fw-bold mb-3 d-inline-block">
+                <i class="bi bi-arrow-left me-1"></i> Back to service details
+            </a>
+        }
 
-        <h3 class="fw-bold text-dark mb-2" style="letter-spacing: -0.5px;">Select Date & Time</h3>
-        <p class="text-muted small mb-4">Choose your preferred slot for the home makeover consultation visit.</p>
+        <h3 class="fw-bold text-dark mb-2" style="letter-spacing: -0.5px;">@(Model.IsReschedule ? "Reschedule Date & Time" : "Select Date & Time")</h3>
+        <p class="text-muted small mb-4">@(Model.IsReschedule ? "Pick a new slot for your existing booking." : "Choose your preferred slot for the home makeover consultation visit.")</p>
 
         <!-- FRONTEND INSTANT ERROR DISPLAY DISMISSABLE ALERT -->
         <div id="frontendAlert" class="alert alert-danger border-0 rounded-3 d-none align-items-center mb-4" role="alert">
@@ -51,6 +60,8 @@
         </div>
 
         <form method="post" id="appointmentForm">
+            <input type="hidden" name="BookingId" value="@Model.BookingId" />
+            <input type="hidden" name="Service" value="@Model.Service" />
             <!-- Part 1: Date Input Field -->
             <div class="mb-4">
                 <label class="form-label small fw-bold text-secondary text-uppercase mb-2">
@@ -102,7 +113,7 @@
             </div>
 
             <button type="submit" class="w-100 brand-purple-btn d-flex align-items-center justify-content-center fs-5 shadow-sm">
-                Confirm Selected Slot
+                @(Model.IsReschedule ? "Save New Slot" : "Confirm Selected Slot")
             </button>
         </form>
 

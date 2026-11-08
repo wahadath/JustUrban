@@ -1,0 +1,60 @@
+@page
+@model JustUrban.Admin.Pages.BookingsModel
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<h1 class="fw-bold mb-4">Bookings</h1>
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <div class="alert alert-success">@Model.Message</div>
+}
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Slot</th>
+                    <th>Status</th>
+                    <th>Vendor</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var booking in Model.Bookings)
+            {
+                <tr>
+                    <td>@booking.Id</td>
+                    <td>
+                        <div class="fw-semibold">@booking.CustomerName</div>
+                        <div class="small text-muted">@booking.ContactNumber</div>
+                    </td>
+                    <td>@booking.ServiceName</td>
+                    <td>@booking.FormattedSlot</td>
+                    <td><span class="badge text-bg-secondary">@booking.Status</span></td>
+                    <td>@(booking.Vendor?.BusinessName ?? booking.PartnerName ?? "-")</td>
+                    <td>
+                        @if (booking.Status != "Cancelled" && booking.Status != "Completed")
+                        {
+                            <form method="post" asp-page-handler="Assign" class="d-flex gap-2">
+                                <input type="hidden" name="bookingId" value="@booking.Id" />
+                                <select name="vendorId" class="form-select form-select-sm" required>
+                                    <option value="">Assign vendor</option>
+                                    @foreach (var vendor in Model.Vendors)
+                                    {
+                                        <option value="@vendor.Id">@vendor.BusinessName</option>
+                                    }
+                                </select>
+                                <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

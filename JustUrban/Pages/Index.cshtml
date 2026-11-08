@@ -4,7 +4,7 @@
     ViewData["Title"] = "Home page";
 }
 
-<!-- Custom CSS Styles for Layout Enhancements -->
+<!-- Custom CSS Styles for Layout & Modal Enhancements -->
 <style>
     .service-card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -12,113 +12,123 @@
         background: #f8f9fa;
         border: none;
         border-radius: 12px;
-        min-height: 140px;
+        min-height: 120px;
     }
 
-        .service-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-            background: #ffffff;
-        }
+    .service-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+        background: #ffffff;
+    }
 
     .stat-box {
         max-width: 500px;
         margin: 0 auto;
     }
+
+    .modal-sub-card {
+        background-color: #f8f9fa;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        min-height: 120px;
+    }
+
+    .modal-sub-card:hover {
+        background-color: #f3f0ff !important;
+        border-color: #6b46e5 !important;
+        transform: scale(1.03);
+    }
 </style>
 
 <!-- Centered Layout Container -->
-<div class="container my-5 py-4">
+<div class="container my-3 py-2">
     <div class="row justify-content-center text-center">
         <div class="col-lg-8">
 
             <!-- Main Title Section -->
-            <h1 class="display-4 fw-bold text-dark mb-5" style="letter-spacing: -1px; line-height: 1.2;">
+            <h1 class="display-5 fw-bold text-dark mb-4" style="letter-spacing: -1px; line-height: 1.2;">
                 Home services at your doorstep
             </h1>
 
             <!-- Services Grid Box containing the 4 custom options -->
-            <div class="card p-4 shadow-sm border-0 bg-white mb-5" style="border-radius: 16px;">
-                <!-- Responsive Grid: 2 columns on mobile, 4 columns on medium/large displays -->
+            <div class="card p-3 shadow-sm border-0 bg-white mb-4" style="border-radius: 16px;">
                 <div class="row row-cols-2 row-cols-md-4 g-3 text-center">
 
                     <!-- Option 1: Painting -->
-                    <!-- Option 1: Painting -->
-<div class="col">
-    <a asp-page="/Booking" class="text-decoration-none">
-        <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center">
-            <!-- REPLACED: Changed from text emoji to custom PNG layout image -->
-            <div class="mb-2 d-flex align-items-center justify-content-center" style="height: 48px;">
-                <img src="~/images/paint-roller.png" alt="Painting" asp-append-version="true" style="height: 100%; width: auto; object-fit: contain;" />
-            </div>
-            <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Painting</small>
-        </div>
-    </a>
-</div>
-
+                    <div class="col">
+                        <a asp-page="/Booking" class="text-decoration-none">
+                            <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center">
+                                <div class="mb-2 d-flex align-items-center justify-content-center" style="height: 48px;">
+                                    <img src="~/images/paint_roller.jpg" alt="Painting" asp-append-version="true" style="height: 125%; width: auto; object-fit: contain;" />
+                                </div>
+                                <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Painting</small>
+                            </div>
+                        </a>
+                    </div>
 
                     <!-- Option 2: Polishing -->
                     <div class="col">
-    <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center" 
-         data-bs-toggle="modal" data-bs-target="#polishingOptionsModal">
-        <span class="fs-1 mb-2">🚪</span>
-        <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Polishing</small>
-    </div>
-</div>
+                        <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center" 
+                             id="btnPolishing"
+                             data-bs-toggle="modal" 
+                             data-bs-target="#polishingOptionsModal">
+                            <div class="mb-2 d-flex align-items-center justify-content-center" style="height: 48px;">
+                                <img src="~/images/wood-polish.png" alt="wood-polish" asp-append-version="true" style="height: 125%; width: auto; object-fit: contain;" />
+                            </div>
+                            <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Polishing</small>
+                        </div>
+                    </div>
 
                     <!-- Option 3: Texture Paint -->
                     <div class="col">
-    <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center" 
-         data-bs-toggle="modal" data-bs-target="#textureOptionsModal">
-        <span class="fs-1 mb-2">🔲</span>
-        <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Texture Paint</small>
-    </div>
-</div>
+                        <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center" 
+                             id="btnTexture"
+                             data-bs-toggle="modal" 
+                             data-bs-target="#textureOptionsModal">
+                            <span class="fs-1 mb-2">🔲</span>
+                            <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Texture Paint</small>
+                        </div>
+                    </div>
 
                     <!-- Option 4: Waterproofing -->
                     <div class="col">
                         <a asp-page="/Booking" class="text-decoration-none">
-                        <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center">
-                            <span class="fs-1 mb-2">💧</span>
-                            <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Waterproofing</small>
-                        </div>
+                            <div class="service-card p-3 d-flex flex-column align-items-center justify-content-center">
+                                <span class="fs-1 mb-2">💧</span>
+                                <small class="fw-bold text-secondary" style="font-size: 0.85rem;">Waterproofing</small>
+                            </div>
                         </a>
                     </div>
 
                 </div>
             </div>
 
-            <!-- REPLACED: Trust Statistics Section (Matches Screenshot Exactly) -->
-            <div class="stat-box mt-5 pt-2">
+            <!-- Trust Statistics Section -->
+            <div class="stat-box mt-3">
                 <div class="row justify-content-center align-items-center g-4">
 
                     <!-- Stat 1: Service Rating -->
                     <div class="col-6 col-sm-5 d-flex align-items-center justify-content-center text-start">
-    <!-- REPLACED: Bootstrap icon swapped out for your custom rating image container -->
-    <div class="me-3" style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
-        <img src="~/images/star.png" alt="Rating Logo" asp-append-version="true" style="width: 100%; height: auto; object-fit: contain;" />
-    </div>
-    
-    <!-- Text Metrics Stack -->
-    <div>
-        <h3 class="fw-bold text-dark mb-0 lh-1" style="font-size: 2rem; letter-spacing: -0.5px;">4.8</h3>
-        <small class="text-muted" style="font-size: 0.85rem; display: block; margin-top: 4px;">Service Rating*</small>
-    </div>
-</div>
+                        <div class="me-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                            <span style="font-size: 2.2rem; line-height: 1;">⭐</span>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold text-dark mb-0 lh-1" style="font-size: 1.8rem; letter-spacing: -0.5px;">4.8</h3>
+                            <small class="text-muted" style="font-size: 0.85rem; display: block; margin-top: 4px;">Service Rating*</small>
+                        </div>
+                    </div>
 
                     <!-- Stat 2: Customers Globally -->
-                     <div class="col-6 col-sm-5 d-flex align-items-center justify-content-center text-start">
-    <!-- REPLACED: Bootstrap icon swapped out for your customer globally image container -->
-    <div class="me-3" style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
-        <img src="~/images/group.png" alt="Customers globally Logo" asp-append-version="true" style="width: 100%; height: auto; object-fit: contain;" />
-    </div>
-    
-    <!-- Text Metrics Stack -->
-    <div>
-        <h3 class="fw-bold text-dark mb-0 lh-1" style="font-size: 2rem; letter-spacing: -0.5px;">1M+</h3>
-        <small class="text-muted" style="font-size: 0.85rem; display: block; margin-top: 4px;">Customers Globally</small>
-    </div>
-</div>
+                    <div class="col-6 col-sm-5 d-flex align-items-center justify-content-center text-start">
+                        <div class="me-3 flex-shrink-0 overflow-hidden d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                            <img src="~/images/users.png" alt="Customers globally Logo" asp-append-version="true" 
+                                 style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.4);" />
+                        </div>
+                        <div>
+                            <h3 class="fw-bold text-dark mb-0 lh-1" style="font-size: 1.8rem; letter-spacing: -0.5px;">1M+</h3>
+                            <small class="text-muted fw-medium lh-sm" style="font-size: 0.85rem; display: block; margin-top: 4px;">Customers Globally</small>
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -126,40 +136,37 @@
         </div>
     </div>
 </div>
+
 <!-- ========================================== -->
 <!--       INTERACTIVE SERVICE POP-UP MODALS    -->
 <!-- ========================================== -->
 
 <!-- POP-UP 1: POLISHING OPTIONS MODAL -->
-<div class="modal fade" id="polishingOptionsModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="polishingOptionsModal" tabindex="-1" aria-labelledby="polishingModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
         <div class="modal-content border-0 p-4 shadow" style="border-radius: 24px;">
             
-            <!-- Modal Header -->
             <div class="modal-header border-0 p-0 mb-3 d-flex justify-content-between align-items-center">
-                <h4 class="fw-bold text-dark m-0" style="letter-spacing: -0.5px;">Select Polishing Type</h4>
+                <h4 class="fw-bold text-dark m-0" id="polishingModalLabel" style="letter-spacing: -0.5px;">Select Polishing Type</h4>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
             <p class="text-muted small mb-4">Please pick your preferred wood finish to continue to booking details.</p>
 
-            <!-- Sub-Options Content Grid -->
             <div class="row g-3">
-                <!-- Sub-Option A: Touch Wood -->
                 <div class="col-6">
                     <a class="text-decoration-none" asp-page="/Booking" asp-route-service="touchwood">
                         <div class="modal-sub-card p-4 text-center border rounded-3 d-flex flex-column align-items-center justify-content-center h-100">
-                            <span class="fs-1 mb-2"></span>
+                            <span class="fs-1 mb-2">🪵</span>
                             <span class="fw-bold text-dark small d-block">Touch Wood</span>
                         </div>
                     </a>
                 </div>
 
-                <!-- Sub-Option B: Melamine -->
                 <div class="col-6">
                     <a class="text-decoration-none" asp-page="/Booking" asp-route-service="melamine">
                         <div class="modal-sub-card p-4 text-center border rounded-3 d-flex flex-column align-items-center justify-content-center h-100">
-                            <span class="fs-1 mb-2"></span>
+                            <span class="fs-1 mb-2">✨</span>
                             <span class="fw-bold text-dark small d-block">Melamine</span>
                         </div>
                     </a>
@@ -169,37 +176,32 @@
     </div>
 </div>
 
-
 <!-- POP-UP 2: TEXTURE OPTIONS MODAL -->
-<div class="modal fade" id="textureOptionsModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="textureOptionsModal" tabindex="-1" aria-labelledby="textureModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
         <div class="modal-content border-0 p-4 shadow" style="border-radius: 24px;">
             
-            <!-- Modal Header -->
             <div class="modal-header border-0 p-0 mb-3 d-flex justify-content-between align-items-center">
-                <h4 class="fw-bold text-dark m-0" style="letter-spacing: -0.5px;">Select Service Type</h4>
+                <h4 class="fw-bold text-dark m-0" id="textureModalLabel" style="letter-spacing: -0.5px;">Select Service Type</h4>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
             <p class="text-muted small mb-4">Please pick your specific design choice to continue to booking details.</p>
 
-            <!-- Sub-Options Content Grid -->
             <div class="row g-3">
-                <!-- Sub-Option A: Standard Texture -->
                 <div class="col-6">
                     <a class="text-decoration-none" asp-page="/Booking" asp-route-service="texture">
                         <div class="modal-sub-card p-4 text-center border rounded-3 d-flex flex-column align-items-center justify-content-center h-100">
-                            <span class="fs-1 mb-2"></span>
+                            <span class="fs-1 mb-2">🎨</span>
                             <span class="fw-bold text-dark small d-block">Texture</span>
                         </div>
                     </a>
                 </div>
 
-                <!-- Sub-Option B: Wall Moulding -->
                 <div class="col-6">
                     <a class="text-decoration-none" asp-page="/Booking" asp-route-service="moulding">
                         <div class="modal-sub-card p-4 text-center border rounded-3 d-flex flex-column align-items-center justify-content-center h-100">
-                            <span class="fs-1 mb-2"></span>
+                            <span class="fs-1 mb-2">🖼️</span>
                             <span class="fw-bold text-dark small d-block">Wall Moulding</span>
                         </div>
                     </a>
@@ -209,18 +211,31 @@
     </div>
 </div>
 
-<!-- Unified Styles for both Pop-Up Layout Cards -->
-<style>
-    .modal-sub-card {
-        background-color: #f8f9fa;
-        transition: all 0.2s ease-in-out;
-        cursor: pointer;
-        min-height: 130px;
-    }
+@section Scripts {
+    <!-- Ensure Bootstrap 5 JS bundle is loaded -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
     
-    .modal-sub-card:hover {
-        background-color: #f3f0ff !important; /* Soft purple hue matches your brand theme */
-        border-color: #6b46e5 !important;   /* Brand Purple highlight border */
-        transform: scale(1.03);
-    }
-</style>
+    <!-- JavaScript fallback triggering mechanism -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var polishingBtn = document.getElementById('btnPolishing');
+            var textureBtn = document.getElementById('btnTexture');
+
+            if (polishingBtn) {
+                polishingBtn.addEventListener('click', function () {
+                    var modalElem = document.getElementById('polishingOptionsModal');
+                    var modalInstance = bootstrap.Modal.getInstance(modalElem) || new bootstrap.Modal(modalElem);
+                    modalInstance.show();
+                });
+            }
+
+            if (textureBtn) {
+                textureBtn.addEventListener('click', function () {
+                    var modalElem = document.getElementById('textureOptionsModal');
+                    var modalInstance = bootstrap.Modal.getInstance(modalElem) || new bootstrap.Modal(modalElem);
+                    modalInstance.show();
+                });
+            }
+        });
+    </script>
+}

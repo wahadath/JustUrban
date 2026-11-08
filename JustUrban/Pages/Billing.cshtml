@@ -61,31 +61,31 @@
                 <!-- Name Field Input Box -->
                 <div class="col-12">
                     <label class="form-label small fw-semibold text-secondary">Name</label>
-                    <input type="text" name="CustomerName" class="form-control py-2 rounded-3" placeholder="Enter full name" required />
+                    <input type="text" name="CustomerName" value="@Model.CustomerName" class="form-control py-2 rounded-3" placeholder="Enter full name" required />
                 </div>
 
                 <!-- Contact Field Input Box -->
                 <div class="col-12">
                     <label class="form-label small fw-semibold text-secondary">Contact</label>
-                    <input type="tel" name="ContactNumber" class="form-control py-2 rounded-3" placeholder="Enter contact phone number" required />
+                    <input type="tel" name="ContactNumber" value="@Model.ContactNumber" class="form-control py-2 rounded-3" placeholder="Enter contact phone number" required />
                 </div>
 
                 <!-- City Field Input Box -->
                 <div class="col-md-6">
                     <label class="form-label small fw-semibold text-secondary">City</label>
-                    <input type="text" name="City" class="form-control py-2 rounded-3" placeholder="e.g. Bengaluru" required />
+                    <input type="text" name="City" value="@Model.City" class="form-control py-2 rounded-3" placeholder="e.g. Bengaluru" required />
                 </div>
 
                 <!-- Pincode Field Input Box -->
                 <div class="col-md-6">
                     <label class="form-label small fw-semibold text-secondary">Pincode</label>
-                    <input type="text" name="Pincode" class="form-control py-2 rounded-3" placeholder="6-digit pincode" pattern="\d{6}" required />
+                    <input type="text" name="Pincode" value="@Model.Pincode" class="form-control py-2 rounded-3" placeholder="6-digit pincode" pattern="\d{6}" required />
                 </div>
 
                 <!-- Address Input Box Textarea element -->
                 <div class="col-12 mb-2">
                     <label class="form-label small fw-semibold text-secondary">Address</label>
-                    <textarea name="StreetAddress" rows="3" class="form-control rounded-3" placeholder="House number, street address, locality details..." required></textarea>
+                    <textarea name="StreetAddress" rows="3" class="form-control rounded-3" placeholder="House number, street address, locality details..." required>@Model.StreetAddress</textarea>
                 </div>
 
                 <!-- Map Integration Block Option -->

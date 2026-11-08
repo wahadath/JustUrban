@@ -1,0 +1,64 @@
+@page
+@model JustUrban.Pages.ProfileModel
+@{
+    ViewData["Title"] = "My profile";
+    var user = Model.Account!;
+}
+
+<style>
+    .profile-card {
+        border-radius: 24px;
+        border: 1px solid #edf2f7;
+        max-width: 640px;
+        background: #fff;
+    }
+    .profile-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #718096;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+</style>
+
+<div class="container my-5 d-flex justify-content-center">
+    <div class="card profile-card p-4 p-md-5 shadow-sm w-100">
+        <h3 class="fw-bold mb-1" style="letter-spacing: -0.5px;">My profile</h3>
+        <p class="text-muted small mb-4">Login uses your phone number. Name and address are saved when you complete billing.</p>
+
+        <div class="mb-4 p-3 bg-light rounded-3">
+            <div class="profile-label">Phone (login)</div>
+            <div class="fw-semibold fs-5">@user.PhoneDisplay</div>
+            <div class="text-success small mt-1">Verified</div>
+        </div>
+
+        <div class="mb-3">
+            <div class="profile-label">Name</div>
+            @if (string.IsNullOrWhiteSpace(user.FullName))
+            {
+                <p class="text-muted mb-0">Not added yet. This is collected on the Billing page when you book a service.</p>
+            }
+            else
+            {
+                <p class="fw-semibold mb-0">@user.FullName</p>
+            }
+        </div>
+
+        <div class="mb-4">
+            <div class="profile-label">Saved address</div>
+            @if (!user.HasAddress)
+            {
+                <p class="text-muted mb-0">No address yet. Your house details from Billing will appear here after the first booking.</p>
+            }
+            else
+            {
+                <p class="mb-0">@user.StreetAddress</p>
+                <p class="mb-0">@user.City @user.Pincode</p>
+            }
+        </div>
+
+        <a asp-page="/MyBookings" class="btn btn-dark rounded-3 px-4">View my bookings</a>
+        <a asp-page="/Logout" class="btn btn-outline-secondary rounded-3 px-4 ms-2">Log out</a>
+    </div>
+</div>

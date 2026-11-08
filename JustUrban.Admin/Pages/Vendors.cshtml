@@ -1,0 +1,77 @@
+@page
+@model JustUrban.Admin.Pages.VendorsModel
+@{
+    ViewData["Title"] = "Vendors";
+}
+
+<h1 class="fw-bold mb-4">Vendors</h1>
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <div class="alert alert-success">@Model.Message</div>
+}
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th>Business</th>
+                            <th>Phone</th>
+                            <th>City</th>
+                            <th>Login</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var vendor in Model.Vendors)
+                    {
+                        <tr>
+                            <td>@vendor.BusinessName</td>
+                            <td>@vendor.Phone</td>
+                            <td>@vendor.City</td>
+                            <td>@vendor.User?.Email</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-3">Add vendor</h5>
+            <form method="post">
+                <div class="mb-2">
+                    <label class="form-label">Business name</label>
+                    <input asp-for="BusinessName" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Phone</label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Email (login)</label>
+                    <input asp-for="Email" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Password</label>
+                    <input asp-for="Password" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">City</label>
+                    <input asp-for="City" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Services</label>
+                    <input asp-for="Services" class="form-control" />
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Create vendor</button>
+            </form>
+        </div>
+    </div>
+</div>

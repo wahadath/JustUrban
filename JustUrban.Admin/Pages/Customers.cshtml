@@ -1,0 +1,32 @@
+@page
+@model JustUrban.Admin.Pages.CustomersModel
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<h1 class="fw-bold mb-4">Customers</h1>
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>City</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var customer in Model.Customers)
+            {
+                <tr>
+                    <td>@(customer.FullName ?? "—")</td>
+                    <td>@customer.PhoneDisplay</td>
+                    <td>@(customer.City ?? "—")</td>
+                    <td>@customer.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
