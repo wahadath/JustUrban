@@ -1,4 +1,5 @@
 using JustUrban.Data;
+using JustUrban.Storage;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseKycUploads();
 app.UseRouting();
 app.UseAuthorization();
 app.MapStaticAssets();

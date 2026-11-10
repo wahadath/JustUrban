@@ -1,4 +1,5 @@
 @page
+@using JustUrban.Models
 @model JustUrban.Admin.Pages.VendorsModel
 @{
     ViewData["Title"] = "Vendors";
@@ -9,69 +10,121 @@
 {
     <div class="alert alert-success">@Model.Message</div>
 }
-@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+@if (Model.PendingVendors.Count > 0)
 {
-    <div class="alert alert-danger">@Model.ErrorMessage</div>
+    <h2 class="h5 fw-bold mb-3">Waiting for verification (@Model.PendingVendors.Count)</h2>
+    <div class="row g-4 mb-5">
+        @foreach (var vendor in Model.PendingVendors)
+        {
+            <div class="col-12">
+                <div class="card border-warning shadow-sm p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h5 class="fw-bold mb-1">@(string.IsNullOrWhiteSpace(vendor.User?.FullName) ? vendor.BusinessName : vendor.User!.FullName)</h5>
+                            <div class="small text-muted">@vendor.Phone</div>
+                            <div class="small text-muted">@vendor.User?.Email · @vendor.City @vendor.Pincode</div>
+                            <div class="small">@vendor.Services</div>
+                        </div>
+                        <span class="badge text-bg-warning">Pending</span>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-4">
+                            <div class="fw-semibold small mb-1">Aadhaar front</div>
+                            <div class="small text-muted mb-1">@vendor.AadhaarNumber</div>
+                            @if (!string.IsNullOrWhiteSpace(vendor.AadhaarPhotoPath))
+                            {
+                                <a href="@vendor.AadhaarPhotoPath" target="_blank">
+                                    <img src="@vendor.AadhaarPhotoPath" alt="Aadhaar front" class="img-fluid rounded border" style="max-height:160px;object-fit:cover;width:100%;" />
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="text-muted small">No front photo</div>
+                            }
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-semibold small mb-1">Aadhaar back</div>
+                            @if (!string.IsNullOrWhiteSpace(vendor.AadhaarBackPhotoPath))
+                            {
+                                <a href="@vendor.AadhaarBackPhotoPath" target="_blank">
+                                    <img src="@vendor.AadhaarBackPhotoPath" alt="Aadhaar back" class="img-fluid rounded border" style="max-height:160px;object-fit:cover;width:100%;" />
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="text-muted small">No back photo</div>
+                            }
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-semibold small mb-1">PAN @vendor.PanNumber</div>
+                            @if (!string.IsNullOrWhiteSpace(vendor.PanPhotoPath))
+                            {
+                                <a href="@vendor.PanPhotoPath" target="_blank">
+                                    <img src="@vendor.PanPhotoPath" alt="PAN" class="img-fluid rounded border" style="max-height:160px;object-fit:cover;width:100%;" />
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="text-muted small">No photo</div>
+                            }
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <form method="post" asp-page-handler="Approve">
+                            <input type="hidden" name="id" value="@vendor.Id" />
+                            <button class="btn btn-success" type="submit">Yes, approve</button>
+                        </form>
+                        <form method="post" asp-page-handler="Reject" class="d-flex gap-2 flex-grow-1">
+                            <input type="hidden" name="id" value="@vendor.Id" />
+                            <input name="rejectionReason" class="form-control" placeholder="Reason (optional)" />
+                            <button class="btn btn-outline-danger" type="submit">No, reject</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }
 
-<div class="row g-4">
-    <div class="col-lg-7">
-        <div class="card border-0 shadow-sm">
-            <div class="table-responsive">
-                <table class="table mb-0 align-middle">
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
                     <thead>
                         <tr>
-                            <th>Business</th>
+                            <th>Name</th>
                             <th>Phone</th>
                             <th>City</th>
+                            <th>Zip</th>
                             <th>Login</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                     @foreach (var vendor in Model.Vendors)
                     {
                         <tr>
-                            <td>@vendor.BusinessName</td>
+                            <td>@(string.IsNullOrWhiteSpace(vendor.User?.FullName) ? vendor.BusinessName : vendor.User!.FullName)</td>
                             <td>@vendor.Phone</td>
                             <td>@vendor.City</td>
+                            <td>@vendor.Pincode</td>
                             <td>@vendor.User?.Email</td>
+                            <td>
+                                @if (vendor.VerificationStatus == VendorVerification.Approved)
+                                {
+                                    <span class="badge text-bg-success">Approved</span>
+                                }
+                                else if (vendor.VerificationStatus == VendorVerification.Pending)
+                                {
+                                    <span class="badge text-bg-warning">Pending</span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-danger">Rejected</span>
+                                }
+                            </td>
                         </tr>
                     }
                     </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-5">
-        <div class="card border-0 shadow-sm p-4">
-            <h5 class="fw-bold mb-3">Add vendor</h5>
-            <form method="post">
-                <div class="mb-2">
-                    <label class="form-label">Business name</label>
-                    <input asp-for="BusinessName" class="form-control" />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Phone</label>
-                    <input asp-for="Phone" class="form-control" />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Email (login)</label>
-                    <input asp-for="Email" class="form-control" />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Password</label>
-                    <input asp-for="Password" class="form-control" />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">City</label>
-                    <input asp-for="City" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Services</label>
-                    <input asp-for="Services" class="form-control" />
-                </div>
-                <button class="btn btn-primary w-100" type="submit">Create vendor</button>
-            </form>
-        </div>
+        </table>
     </div>
 </div>

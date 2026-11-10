@@ -23,7 +23,8 @@
                         <li class="nav-item"><a class="nav-link" asp-page="/Vendors">Vendors</a></li>
                         <li class="nav-item"><a class="nav-link" asp-page="/Customers">Customers</a></li>
                     </ul>
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav align-items-md-center">
+                        @await Component.InvokeAsync("AdminNotifications")
                         <li class="nav-item"><a class="nav-link" asp-page="/Logout">Log out</a></li>
                     </ul>
                 </div>

@@ -9,7 +9,21 @@
 {
     <div class="alert alert-success">@Model.Message</div>
 }
-@if (Model.Jobs.Count == 0)
+@if (Model.CurrentVendor?.VerificationStatus == JustUrban.Models.VendorVerification.Pending)
+{
+    <div class="alert alert-warning">
+        <strong>Waiting for admin verification.</strong>
+        Your Aadhaar and PAN have been submitted. You can take jobs only after admin selects Yes.
+    </div>
+}
+else if (Model.CurrentVendor?.VerificationStatus == JustUrban.Models.VendorVerification.Rejected)
+{
+    <div class="alert alert-danger">
+        <strong>Application rejected.</strong>
+        @(string.IsNullOrWhiteSpace(Model.CurrentVendor.RejectionReason) ? "Admin selected No. Contact Just Urban if you want to apply again." : Model.CurrentVendor.RejectionReason)
+    </div>
+}
+else if (Model.Jobs.Count == 0)
 {
     <div class="alert alert-info">No jobs assigned yet. Ask admin to assign a booking to you.</div>
 }

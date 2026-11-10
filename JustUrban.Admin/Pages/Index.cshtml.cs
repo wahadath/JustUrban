@@ -1,5 +1,6 @@
 using JustUrban.Auth;
 using JustUrban.Data;
+using JustUrban.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ namespace JustUrban.Admin.Pages
         public int PendingAssignment { get; set; }
         public int Completed { get; set; }
         public int VendorCount { get; set; }
+        public int PendingVendorCount { get; set; }
         public int CustomerCount { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
@@ -32,8 +34,9 @@ namespace JustUrban.Admin.Pages
             PendingAssignment = await _db.Bookings.CountAsync(b =>
                 b.VendorId == null && b.Status != "Cancelled" && b.Status != "Completed");
             Completed = await _db.Bookings.CountAsync(b => b.Status == "Completed");
-            VendorCount = await _db.Vendors.CountAsync();
-            CustomerCount = await _db.Users.CountAsync(u => u.Role == "Customer");
+            VendorCount = await _db.Vendors.CountAsync(v => v.VerificationStatus == VendorVerification.Approved);
+            PendingVendorCount = await _db.Vendors.CountAsync(v => v.VerificationStatus == VendorVerification.Pending);
+            CustomerCount = await _db.Users.CountAsync(u => u.Role == UserRoles.Customer);
             return Page();
         }
     }

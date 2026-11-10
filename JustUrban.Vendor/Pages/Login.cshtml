@@ -9,6 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vendor Login - Just Urban</title>
+    <partial name="_PwaHead" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 </head>
 <body class="bg-light">
@@ -31,7 +32,9 @@
                 </div>
                 <button type="submit" class="btn w-100 text-white" style="background:#0f766e;">Log in</button>
             </form>
-            <p class="small text-muted mt-3 mb-0">Demo: vendor@justurban.local / Vendor@123</p>
+            <a asp-page="/Register" class="btn btn-outline-dark w-100 mt-3">Sign up as a new vendor</a>
+            <p class="small text-muted mt-2 mb-0">Demo: vendor@justurban.local / Vendor@123</p>
+            <p class="small text-muted mt-3 mb-0">On iPhone, open this page in Safari, tap Share, then <strong>Add to Home Screen</strong>.</p>
         </div>
     </div>
 </body>

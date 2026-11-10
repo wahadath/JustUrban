@@ -17,6 +17,7 @@ namespace JustUrban.Vendor.Pages
         }
 
         public List<Booking> Jobs { get; set; } = new();
+        public Models.Vendor? CurrentVendor { get; set; }
         public string? Message { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
@@ -50,6 +51,14 @@ namespace JustUrban.Vendor.Pages
             }
 
             var vendorId = StaffSession.VendorId(Request);
+            var vendor = await _db.Vendors.FirstOrDefaultAsync(v => v.Id == vendorId);
+            if (vendor == null || !vendor.IsApproved)
+            {
+                Message = "Admin has not approved your documents yet.";
+                await LoadAsync();
+                return Page();
+            }
+
             var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == id && b.VendorId == vendorId);
             if (booking != null && booking.Status != "Cancelled")
             {
@@ -66,10 +75,14 @@ namespace JustUrban.Vendor.Pages
         private async Task LoadAsync()
         {
             var vendorId = StaffSession.VendorId(Request);
-            Jobs = await _db.Bookings
-                .Where(b => b.VendorId == vendorId)
-                .OrderByDescending(b => b.SlotDate)
-                .ToListAsync();
+            CurrentVendor = await _db.Vendors.FirstOrDefaultAsync(v => v.Id == vendorId);
+            if (CurrentVendor?.IsApproved == true)
+            {
+                Jobs = await _db.Bookings
+                    .Where(b => b.VendorId == vendorId)
+                    .OrderByDescending(b => b.SlotDate)
+                    .ToListAsync();
+            }
         }
 
         private Task<IActionResult?> EnsureVendorAsync()

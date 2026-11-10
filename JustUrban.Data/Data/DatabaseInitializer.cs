@@ -15,19 +15,10 @@ namespace JustUrban.Data
 
         private static async Task ApplySchemaUpdatesAsync(AppDbContext db)
         {
-            await db.Database.ExecuteSqlRawAsync("""
-                IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL
-                BEGIN
-                    IF COL_LENGTH('dbo.Users', 'Role') IS NULL
-                        ALTER TABLE dbo.Users ADD [Role] nvarchar(20) NOT NULL CONSTRAINT DF_Users_Role DEFAULT ('Customer');
-                    IF COL_LENGTH('dbo.Users', 'Email') IS NULL
-                        ALTER TABLE dbo.Users ADD Email nvarchar(200) NULL;
-                    IF COL_LENGTH('dbo.Users', 'PasswordHash') IS NULL
-                        ALTER TABLE dbo.Users ADD PasswordHash nvarchar(500) NULL;
-                    IF COL_LENGTH('dbo.Users', 'IsActive') IS NULL
-                        ALTER TABLE dbo.Users ADD IsActive bit NOT NULL CONSTRAINT DF_Users_IsActive DEFAULT (1);
-                END
-                """);
+            await AddColumnIfMissingAsync(db, "Users", "Role", "[Role] nvarchar(20) NOT NULL CONSTRAINT DF_Users_Role DEFAULT ('Customer')");
+            await AddColumnIfMissingAsync(db, "Users", "Email", "Email nvarchar(200) NULL");
+            await AddColumnIfMissingAsync(db, "Users", "PasswordHash", "PasswordHash nvarchar(500) NULL");
+            await AddColumnIfMissingAsync(db, "Users", "IsActive", "IsActive bit NOT NULL CONSTRAINT DF_Users_IsActive DEFAULT (1)");
 
             await db.Database.ExecuteSqlRawAsync("""
                 IF OBJECT_ID('dbo.Vendors', 'U') IS NULL
@@ -46,36 +37,37 @@ namespace JustUrban.Data
                 END
                 """);
 
+            await AddColumnIfMissingAsync(db, "Vendors", "Pincode", "Pincode nvarchar(10) NULL");
+            await AddColumnIfMissingAsync(db, "Vendors", "AadhaarNumber", "AadhaarNumber nvarchar(12) NULL");
+            await AddColumnIfMissingAsync(db, "Vendors", "AadhaarPhotoPath", "AadhaarPhotoPath nvarchar(500) NULL");
+            await AddColumnIfMissingAsync(db, "Vendors", "AadhaarBackPhotoPath", "AadhaarBackPhotoPath nvarchar(500) NULL");
+            await AddColumnIfMissingAsync(db, "Vendors", "PanNumber", "PanNumber nvarchar(10) NULL");
+            await AddColumnIfMissingAsync(db, "Vendors", "PanPhotoPath", "PanPhotoPath nvarchar(500) NULL");
+            await AddColumnIfMissingAsync(db, "Vendors", "VerificationStatus", "VerificationStatus nvarchar(20) NOT NULL CONSTRAINT DF_Vendors_VerificationStatus DEFAULT ('Approved')");
+            await AddColumnIfMissingAsync(db, "Vendors", "RejectionReason", "RejectionReason nvarchar(500) NULL");
+            await AddColumnIfMissingAsync(db, "Vendors", "VerifiedAt", "VerifiedAt datetime2 NULL");
+
+            await AddColumnIfMissingAsync(db, "Bookings", "UserId", "UserId int NULL");
+            await AddColumnIfMissingAsync(db, "Bookings", "PartnerName", "PartnerName nvarchar(200) NULL");
+            await AddColumnIfMissingAsync(db, "Bookings", "PartnerPhone", "PartnerPhone nvarchar(30) NULL");
+            await AddColumnIfMissingAsync(db, "Bookings", "CancellationReason", "CancellationReason nvarchar(500) NULL");
+            await AddColumnIfMissingAsync(db, "Bookings", "CancelledAt", "CancelledAt datetime2 NULL");
+            await AddColumnIfMissingAsync(db, "Bookings", "VendorId", "VendorId int NULL");
+
             await db.Database.ExecuteSqlRawAsync("""
                 IF OBJECT_ID('dbo.Bookings', 'U') IS NOT NULL
-                BEGIN
-                    IF COL_LENGTH('dbo.Bookings', 'UserId') IS NULL
-                        ALTER TABLE dbo.Bookings ADD UserId int NULL;
-                    IF COL_LENGTH('dbo.Bookings', 'PartnerName') IS NULL
-                        ALTER TABLE dbo.Bookings ADD PartnerName nvarchar(200) NULL;
-                    IF COL_LENGTH('dbo.Bookings', 'PartnerPhone') IS NULL
-                        ALTER TABLE dbo.Bookings ADD PartnerPhone nvarchar(30) NULL;
-                    IF COL_LENGTH('dbo.Bookings', 'CancellationReason') IS NULL
-                        ALTER TABLE dbo.Bookings ADD CancellationReason nvarchar(500) NULL;
-                    IF COL_LENGTH('dbo.Bookings', 'CancelledAt') IS NULL
-                        ALTER TABLE dbo.Bookings ADD CancelledAt datetime2 NULL;
-                    IF COL_LENGTH('dbo.Bookings', 'VendorId') IS NULL
-                        ALTER TABLE dbo.Bookings ADD VendorId int NULL;
-                    IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_Bookings_Users')
-                       AND COL_LENGTH('dbo.Bookings', 'UserId') IS NOT NULL
-                       AND OBJECT_ID('dbo.Users', 'U') IS NOT NULL
-                    BEGIN
-                        ALTER TABLE dbo.Bookings ADD CONSTRAINT FK_Bookings_Users
-                            FOREIGN KEY (UserId) REFERENCES dbo.Users(Id);
-                    END
-                    IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_Bookings_Vendors')
-                       AND COL_LENGTH('dbo.Bookings', 'VendorId') IS NOT NULL
-                       AND OBJECT_ID('dbo.Vendors', 'U') IS NOT NULL
-                    BEGIN
-                        ALTER TABLE dbo.Bookings ADD CONSTRAINT FK_Bookings_Vendors
-                            FOREIGN KEY (VendorId) REFERENCES dbo.Vendors(Id);
-                    END
-                END
+                   AND OBJECT_ID('dbo.Users', 'U') IS NOT NULL
+                   AND COL_LENGTH('dbo.Bookings', 'UserId') IS NOT NULL
+                   AND NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_Bookings_Users')
+                    EXEC(N'ALTER TABLE dbo.Bookings ADD CONSTRAINT FK_Bookings_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id)');
+                """);
+
+            await db.Database.ExecuteSqlRawAsync("""
+                IF OBJECT_ID('dbo.Bookings', 'U') IS NOT NULL
+                   AND OBJECT_ID('dbo.Vendors', 'U') IS NOT NULL
+                   AND COL_LENGTH('dbo.Bookings', 'VendorId') IS NOT NULL
+                   AND NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_Bookings_Vendors')
+                    EXEC(N'ALTER TABLE dbo.Bookings ADD CONSTRAINT FK_Bookings_Vendors FOREIGN KEY (VendorId) REFERENCES dbo.Vendors(Id)');
                 """);
         }
 
@@ -108,6 +100,7 @@ namespace JustUrban.Data
                     PasswordHash = PasswordHelper.Hash("Vendor@123"),
                     Role = UserRoles.Vendor,
                     City = "Bangalore",
+                    Pincode = "560001",
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -117,15 +110,28 @@ namespace JustUrban.Data
                 db.Vendors.Add(new Vendor
                 {
                     UserId = vendorUser.Id,
-                    BusinessName = "Just Urban Demo Crew",
+                    BusinessName = vendorUser.FullName,
                     Phone = vendorUser.PhoneDisplay,
                     City = "Bangalore",
+                    Pincode = "560001",
                     Services = "Painting, Polishing, Texture, Waterproofing",
                     IsAvailable = true,
+                    VerificationStatus = VendorVerification.Approved,
+                    VerifiedAt = DateTime.UtcNow,
                     CreatedAt = DateTime.UtcNow
                 });
                 await db.SaveChangesAsync();
             }
+        }
+
+        private static async Task AddColumnIfMissingAsync(AppDbContext db, string table, string column, string addSql)
+        {
+            // EXEC so SQL Server compiles ALTER only when the column is missing.
+            var alter = $"ALTER TABLE dbo.{table} ADD {addSql}".Replace("'", "''");
+            await db.Database.ExecuteSqlRawAsync($"""
+                IF OBJECT_ID(N'dbo.{table}', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.{table}', N'{column}') IS NULL
+                    EXEC(N'{alter}');
+                """);
         }
     }
 }

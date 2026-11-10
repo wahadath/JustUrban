@@ -10,6 +10,10 @@
 <link rel="stylesheet" href="~/JustUrban.styles.css" asp-append-version="true" />
 </head>
 <body>
+    <div id="pageLoader" class="page-loader" aria-live="polite" aria-busy="true">
+        <p class="page-loader-label">loading</p>
+        <div class="page-loader-bar"></div>
+    </div>
     <!-- HEADER SECTION -->
     <header>
         <nav class="navbar navbar-expand-md navbar-light border-0 py-3">
@@ -341,6 +345,38 @@
                     new bootstrap.Modal(modal).show();
                 }
             });
+    </script>
+    <script>
+        (function () {
+            var loader = document.getElementById('pageLoader');
+            if (!loader) return;
+
+            function showLoader() {
+                loader.classList.add('is-visible');
+            }
+
+            document.addEventListener('click', function (event) {
+                if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                var link = event.target.closest('a');
+                if (!link || link.target === '_blank' || link.hasAttribute('download') || link.getAttribute('data-bs-toggle')) return;
+                var href = link.getAttribute('href');
+                if (!href || href.charAt(0) === '#' || href.indexOf('javascript:') === 0) return;
+                var next;
+                try { next = new URL(link.href, window.location.href); } catch (e) { return; }
+                if (next.origin !== window.location.origin) return;
+                if (next.pathname === window.location.pathname && next.search === window.location.search) return;
+                showLoader();
+            });
+
+            document.addEventListener('submit', function (event) {
+                if (event.defaultPrevented) return;
+                showLoader();
+            });
+
+            window.addEventListener('pageshow', function () {
+                loader.classList.remove('is-visible');
+            });
+        })();
     </script>
 </body>
 </html>

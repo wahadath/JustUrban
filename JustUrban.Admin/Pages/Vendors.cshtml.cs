@@ -16,28 +16,10 @@ namespace JustUrban.Admin.Pages
             _db = db;
         }
 
+        public List<Vendor> PendingVendors { get; set; } = new();
         public List<Vendor> Vendors { get; set; } = new();
 
-        [BindProperty]
-        public string BusinessName { get; set; } = string.Empty;
-
-        [BindProperty]
-        public string Phone { get; set; } = string.Empty;
-
-        [BindProperty]
-        public string Email { get; set; } = string.Empty;
-
-        [BindProperty]
-        public string Password { get; set; } = "Vendor@123";
-
-        [BindProperty]
-        public string? City { get; set; }
-
-        [BindProperty]
-        public string? Services { get; set; }
-
         public string? Message { get; set; }
-        public string? ErrorMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -50,55 +32,48 @@ namespace JustUrban.Admin.Pages
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostApproveAsync(int id)
+        {
+            return await SetVerificationAsync(id, VendorVerification.Approved, null);
+        }
+
+        public async Task<IActionResult> OnPostRejectAsync(int id, string? rejectionReason)
+        {
+            return await SetVerificationAsync(id, VendorVerification.Rejected, rejectionReason);
+        }
+
+        private async Task<IActionResult> SetVerificationAsync(int id, string status, string? rejectionReason)
         {
             if (!StaffSession.IsLoggedIn(Request, StaffSession.AdminApp))
             {
                 return RedirectToPage("/Login");
             }
 
-            if (string.IsNullOrWhiteSpace(BusinessName) || string.IsNullOrWhiteSpace(Phone) || string.IsNullOrWhiteSpace(Email))
+            var vendor = await _db.Vendors.Include(v => v.User).FirstOrDefaultAsync(v => v.Id == id);
+            if (vendor != null)
             {
-                ErrorMessage = "Business name, phone and email are required.";
-                await LoadAsync();
-                return Page();
+                vendor.VerificationStatus = status;
+                vendor.VerifiedAt = DateTime.UtcNow;
+                vendor.IsAvailable = status == VendorVerification.Approved;
+                vendor.RejectionReason = status == VendorVerification.Rejected
+                    ? (string.IsNullOrWhiteSpace(rejectionReason) ? "Admin selected No." : rejectionReason.Trim())
+                    : null;
+                await _db.SaveChangesAsync();
+                var name = string.IsNullOrWhiteSpace(vendor.User?.FullName) ? vendor.BusinessName : vendor.User!.FullName;
+                Message = status == VendorVerification.Approved
+                    ? $"{name} approved. They can now take jobs."
+                    : $"{name} rejected.";
             }
 
-            var digits = new string(Phone.Where(char.IsDigit).ToArray());
-            var user = new AppUser
-            {
-                PhoneNumber = digits,
-                PhoneDisplay = Phone.Trim(),
-                FullName = BusinessName.Trim(),
-                Email = Email.Trim(),
-                PasswordHash = PasswordHelper.Hash(string.IsNullOrWhiteSpace(Password) ? "Vendor@123" : Password),
-                Role = UserRoles.Vendor,
-                City = City,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-
-            _db.Vendors.Add(new Vendor
-            {
-                UserId = user.Id,
-                BusinessName = BusinessName.Trim(),
-                Phone = Phone.Trim(),
-                City = City,
-                Services = Services,
-                IsAvailable = true,
-                CreatedAt = DateTime.UtcNow
-            });
-            await _db.SaveChangesAsync();
-            Message = "Vendor created. They can log in on the Vendor app.";
             await LoadAsync();
             return Page();
         }
 
         private async Task LoadAsync()
         {
-            Vendors = await _db.Vendors.Include(v => v.User).OrderBy(v => v.BusinessName).ToListAsync();
+            var all = await _db.Vendors.Include(v => v.User).OrderBy(v => v.User!.FullName).ToListAsync();
+            PendingVendors = all.Where(v => v.VerificationStatus == VendorVerification.Pending).ToList();
+            Vendors = all;
         }
     }
 }

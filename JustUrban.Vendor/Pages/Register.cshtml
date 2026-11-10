@@ -1,0 +1,175 @@
+@page
+@model JustUrban.Vendor.Pages.RegisterModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vendor signup - Just Urban</title>
+    <partial name="_PwaHead" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        .doc-tile {
+            width: 108px;
+            height: 118px;
+            border-radius: 16px;
+            background: #f3eefe;
+            color: #6d4aff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            margin: 0;
+        }
+        .doc-tile input { display: none; }
+        .doc-plus { font-size: 28px; line-height: 1; }
+        .doc-caption { font-size: 14px; margin-top: 2px; }
+        .doc-tile img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .doc-tile.has-photo .doc-plus,
+        .doc-tile.has-photo .doc-caption { display: none; }
+        .doc-tile.has-photo img { display: block; }
+        .pan-note { color: #1f8a4c; font-size: 14px; }
+        .no-pan {
+            border: 1px solid #ececec;
+            border-radius: 12px;
+            padding: 12px 14px;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5" style="max-width: 560px;">
+        <div class="card border-0 shadow rounded-4 p-4">
+            <h3 class="fw-bold mb-1">Become a vendor</h3>
+            <p class="text-muted small mb-4">Upload Aadhaar and PAN. Admin will approve or reject your application.</p>
+            @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">@Model.ErrorMessage</div>
+            }
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">Your name</label>
+                    <input asp-for="FullName" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input asp-for="Phone" class="form-control" required />
+                </div>
+                <div class="row">
+                    <div class="col-md-7 mb-3">
+                        <label class="form-label">City</label>
+                        <input asp-for="City" class="form-control" required />
+                    </div>
+                    <div class="col-md-5 mb-3">
+                        <label class="form-label">Zip code</label>
+                        <input asp-for="Pincode" class="form-control" maxlength="6" inputmode="numeric" pattern="\d{6}" placeholder="6-digit zip" required />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email (login)</label>
+                    <input asp-for="Email" type="email" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input asp-for="Password" type="password" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Services</label>
+                    <input asp-for="Services" class="form-control" placeholder="Painting, Polishing..." />
+                </div>
+                <hr />
+                <h5 class="fw-bold mb-3">Add your documents</h5>
+                <div class="fw-semibold mb-2">Aadhaar card</div>
+                <div class="mb-3">
+                    <label class="form-label">Aadhaar number</label>
+                    <input asp-for="AadhaarNumber" class="form-control" maxlength="12" inputmode="numeric" required />
+                </div>
+                @*
+                Aadhaar OTP step. Uncomment with AadhaarOtpClient when the KYC provider is connected.
+                The OTP goes to the mobile number registered on the Aadhaar, then the vendor types it here.
+                <div class="mb-3">
+                    <label class="form-label">Aadhaar OTP</label>
+                    <p class="small text-muted mb-1">Enter the OTP sent to the mobile number linked with this Aadhaar.</p>
+                    <input asp-for="AadhaarOtp" class="form-control" maxlength="6" inputmode="numeric" />
+                </div>
+                *@
+                <div class="d-flex gap-3 mb-4">
+                    <label class="doc-tile">
+                        <input asp-for="AadhaarFrontPhoto" type="file" accept="image/jpeg,image/png,image/webp" required />
+                        <span class="doc-plus">+</span>
+                        <span class="doc-caption">Front</span>
+                        <img alt="Aadhaar front preview" />
+                    </label>
+                    <label class="doc-tile">
+                        <input asp-for="AadhaarBackPhoto" type="file" accept="image/jpeg,image/png,image/webp" required />
+                        <span class="doc-plus">+</span>
+                        <span class="doc-caption">Back</span>
+                        <img alt="Aadhaar back preview" />
+                    </label>
+                </div>
+                <hr />
+                <div class="fw-semibold">PAN card</div>
+                <p class="pan-note mb-2">PAN card will help you save 18% tax per year</p>
+                <div id="panFields">
+                    <div class="mb-3">
+                        <label class="form-label">PAN number</label>
+                        <input asp-for="PanNumber" id="panNumber" class="form-control" maxlength="10" style="text-transform:uppercase" required />
+                    </div>
+                    <label class="doc-tile mb-3">
+                        <input asp-for="PanPhoto" id="panPhoto" type="file" accept="image/jpeg,image/png,image/webp" required />
+                        <span class="doc-plus">+</span>
+                        <span class="doc-caption">Front</span>
+                        <img alt="PAN front preview" />
+                    </label>
+                </div>
+                <label class="no-pan d-flex align-items-center gap-2 mb-4">
+                    <input asp-for="NoPan" class="form-check-input m-0" id="noPan" />
+                    <span>I don't have PAN card</span>
+                </label>
+                <button type="submit" class="btn w-100 text-white" style="background:#0f766e;">Submit for verification</button>
+            </form>
+            <script>
+                document.querySelectorAll('.doc-tile input[type=file]').forEach(function (input) {
+                    input.addEventListener('change', function () {
+                        var tile = input.closest('.doc-tile');
+                        var img = tile.querySelector('img');
+                        var file = input.files && input.files[0];
+                        if (!file) {
+                            tile.classList.remove('has-photo');
+                            img.removeAttribute('src');
+                            return;
+                        }
+                        img.src = URL.createObjectURL(file);
+                        tile.classList.add('has-photo');
+                    });
+                });
+
+                var noPan = document.getElementById('noPan');
+                var panFields = document.getElementById('panFields');
+                function syncPan() {
+                    var skip = noPan.checked;
+                    panFields.style.display = skip ? 'none' : '';
+                    document.getElementById('panNumber').required = !skip;
+                    document.getElementById('panPhoto').required = !skip;
+                }
+                noPan.addEventListener('change', syncPan);
+                syncPan();
+            </script>
+            <p class="small mt-3 mb-0">Already have an account? <a asp-page="/Login">Log in</a></p>
+        </div>
+    </div>
+</body>
+</html>

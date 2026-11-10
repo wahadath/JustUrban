@@ -35,7 +35,7 @@
                     <td>@booking.ServiceName</td>
                     <td>@booking.FormattedSlot</td>
                     <td><span class="badge text-bg-secondary">@booking.Status</span></td>
-                    <td>@(booking.Vendor?.BusinessName ?? booking.PartnerName ?? "-")</td>
+                    <td>@(booking.Vendor?.User?.FullName ?? booking.Vendor?.BusinessName ?? booking.PartnerName ?? "-")</td>
                     <td>
                         @if (booking.Status != "Cancelled" && booking.Status != "Completed")
                         {
@@ -45,7 +45,7 @@
                                     <option value="">Assign vendor</option>
                                     @foreach (var vendor in Model.Vendors)
                                     {
-                                        <option value="@vendor.Id">@vendor.BusinessName</option>
+                                        <option value="@vendor.Id">@(vendor.User?.FullName ?? vendor.BusinessName)</option>
                                     }
                                 </select>
                                 <button class="btn btn-sm btn-primary" type="submit">Save</button>

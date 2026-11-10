@@ -24,13 +24,22 @@
             <div class="fs-2 fw-bold">@Model.Completed</div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card stat-card shadow-sm p-4">
-            <div class="text-muted small">Vendors</div>
+            <div class="text-muted small">Approved vendors</div>
             <div class="fs-2 fw-bold">@Model.VendorCount</div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
+        <a asp-page="/Vendors" class="text-decoration-none text-reset">
+            <div class="card stat-card shadow-sm p-4">
+                <div class="text-muted small">Pending Yes / No</div>
+                <div class="fs-2 fw-bold">@Model.PendingVendorCount</div>
+                <div class="small text-muted mt-1">Open Vendors to approve</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
         <div class="card stat-card shadow-sm p-4">
             <div class="text-muted small">Customers</div>
             <div class="fs-2 fw-bold">@Model.CustomerCount</div>
